@@ -1,0 +1,307 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: oklch(0.9286 0.0322 97.3099);
+    --foreground: oklch(0.2161 0.0061 56.0434);
+    --card: oklch(0.9597 0.0188 96.8650);
+    --card-foreground: oklch(0.2161 0.0061 56.0434);
+    --popover: oklch(0.9286 0.0322 97.3099);
+    --popover-foreground: oklch(0.2161 0.0061 56.0434);
+    --primary: oklch(0.5388 0.1830 25.8642);
+    --primary-foreground: oklch(1.0000 0 0);
+    --secondary: oklch(0.5388 0.1830 25.8642);
+    --secondary-foreground: oklch(1.0000 0 0);
+    --muted: oklch(0.8898 0.0327 95.4261);
+    --muted-foreground: oklch(0.4444 0.0096 73.6390);
+    --accent: oklch(0.8767 0.0420 96.6392);
+    --accent-foreground: oklch(0.5388 0.1830 25.8642);
+    --destructive: oklch(0.4437 0.1613 26.8994);
+    --destructive-foreground: oklch(1.0000 0 0);
+    --border: oklch(0.8590 0.0289 95.9376);
+    --input: oklch(0.8590 0.0289 95.9376);
+    --ring: oklch(0.5388 0.1830 25.8642);
+    --sidebar: oklch(0.9597 0.0188 96.8650);
+    --sidebar-foreground: oklch(0.2161 0.0061 56.0434);
+    --sidebar-primary: oklch(0.5388 0.1830 25.8642);
+    --sidebar-primary-foreground: oklch(1.0000 0 0);
+    --sidebar-accent: oklch(0.8898 0.0327 95.4261);
+    --sidebar-accent-foreground: oklch(0.5388 0.1830 25.8642);
+    --sidebar-border: oklch(0.8590 0.0289 95.9376);
+    --sidebar-ring: oklch(0.5388 0.1830 25.8642);
+  }
+
+  .dark {
+    --background: oklch(0.2161 0.0061 56.0434);
+    --foreground: oklch(0.9286 0.0322 97.3099);
+    --card: oklch(0.2685 0.0063 34.2976);
+    --card-foreground: oklch(0.9286 0.0322 97.3099);
+    --popover: oklch(0.2161 0.0061 56.0434);
+    --popover-foreground: oklch(0.9286 0.0322 97.3099);
+    --primary: oklch(0.5388 0.1830 25.8642);
+    --primary-foreground: oklch(1.0000 0 0);
+    --secondary: oklch(0.9286 0.0322 97.3099);
+    --secondary-foreground: oklch(0.2161 0.0061 56.0434);
+    --muted: oklch(0.2685 0.0063 34.2976);
+    --muted-foreground: oklch(0.7161 0.0091 56.2590);
+    --accent: oklch(0.2963 0.0079 59.3653);
+    --accent-foreground: oklch(0.9286 0.0322 97.3099);
+    --destructive: oklch(0.4437 0.1613 26.8994);
+    --destructive-foreground: oklch(1.0000 0 0);
+    --border: oklch(0.2963 0.0079 59.3653);
+    --input: oklch(0.2963 0.0079 59.3653);
+    --ring: oklch(0.5388 0.1830 25.8642);
+    --sidebar: oklch(0.2685 0.0063 34.2976);
+    --sidebar-foreground: oklch(0.9286 0.0322 97.3099);
+    --sidebar-primary: oklch(0.5388 0.1830 25.8642);
+    --sidebar-primary-foreground: oklch(1.0000 0 0);
+    --sidebar-accent: oklch(0.2963 0.0079 59.3653);
+    --sidebar-accent-foreground: oklch(0.9286 0.0322 97.3099);
+    --sidebar-border: oklch(0.2963 0.0079 59.3653);
+    --sidebar-ring: oklch(0.5388 0.1830 25.8642);
+  }
+
+  * {
+    border-color: var(--border);
+  }
+  
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    @apply font-sans;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: var(--card);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-600 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-500;
+  }
+}
+
+@layer components {
+  /* Card */
+  .card {
+    background-color: var(--card);
+    color: var(--card-foreground);
+    border-color: var(--border);
+    @apply rounded-xl border shadow-card;
+  }
+
+  /* KPI Card */
+  .kpi-card {
+    @apply card p-6 transition-all duration-200 hover:border-primary-600 hover:shadow-glow cursor-default;
+  }
+
+  /* Button variants */
+  .btn {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm
+           transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    @apply btn hover:opacity-90 shadow-sm;
+  }
+
+  .btn-secondary {
+    background-color: var(--card);
+    color: var(--foreground);
+    border-color: var(--border);
+    @apply btn border hover:bg-accent hover:text-accent-foreground;
+  }
+
+  .btn-danger {
+    background-color: var(--destructive);
+    color: var(--destructive-foreground);
+    @apply btn hover:opacity-90;
+  }
+
+  .btn-ghost {
+    color: var(--foreground);
+    @apply btn hover:bg-accent hover:text-accent-foreground;
+  }
+
+  /* Form inputs */
+  .input {
+    background-color: var(--input);
+    color: var(--foreground);
+    border-color: var(--border);
+    @apply w-full border rounded-lg px-3 py-2 text-sm
+           focus:outline-none focus:ring-2 focus:border-transparent
+           transition-all duration-150;
+  }
+
+  .select {
+    @apply input appearance-none cursor-pointer;
+  }
+
+  /* Status badges */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
+  }
+
+  .badge-open {
+    @apply badge bg-blue-500/20 text-blue-400 border border-blue-500/30;
+  }
+
+  .badge-in-progress {
+    @apply badge bg-amber-500/20 text-amber-400 border border-amber-500/30;
+  }
+
+  .badge-pending {
+    @apply badge bg-purple-500/20 text-purple-400 border border-purple-500/30;
+  }
+
+  .badge-resolved {
+    @apply badge bg-emerald-500/20 text-emerald-400 border border-emerald-500/30;
+  }
+
+  .badge-closed {
+    @apply badge bg-slate-500/20 text-slate-400 border border-slate-500/30;
+  }
+
+  /* Priority badges */
+  .priority-critical {
+    @apply badge bg-red-500/20 text-red-400 border border-red-500/30;
+  }
+
+  .priority-high {
+    @apply badge bg-orange-500/20 text-orange-400 border border-orange-500/30;
+  }
+
+  .priority-medium {
+    @apply badge bg-yellow-500/20 text-yellow-400 border border-yellow-500/30;
+  }
+
+  .priority-low {
+    @apply badge bg-green-500/20 text-green-400 border border-green-500/30;
+  }
+
+  /* SLA badges */
+  .sla-met {
+    @apply badge bg-emerald-500/20 text-emerald-400 border border-emerald-500/30;
+  }
+
+  .sla-breached {
+    @apply badge bg-red-500/20 text-red-400 border border-red-500/30;
+  }
+
+  .sla-pending {
+    @apply badge bg-slate-500/20 text-slate-400 border border-slate-500/30;
+  }
+
+  /* Table */
+  .table-wrapper {
+    border-color: var(--border);
+    @apply overflow-x-auto rounded-xl border;
+  }
+
+  .table {
+    @apply w-full text-sm text-left;
+  }
+
+  .table thead tr {
+    background-color: var(--muted);
+    color: var(--muted-foreground);
+    @apply uppercase text-xs tracking-wider;
+  }
+
+  .table thead th {
+    @apply px-4 py-3 font-semibold;
+  }
+
+  .table tbody tr {
+    border-color: var(--border);
+    @apply border-t hover:bg-muted transition-colors duration-100;
+  }
+
+  .table tbody td {
+    color: var(--foreground);
+    @apply px-4 py-3;
+  }
+
+  /* Page header */
+  .page-header {
+    @apply mb-6 flex items-center justify-between;
+  }
+
+  .page-title {
+    @apply text-2xl font-bold text-white;
+  }
+
+  .page-subtitle {
+    @apply text-sm text-slate-400 mt-1;
+  }
+
+  /* Sidebar item */
+  .sidebar-item {
+    color: var(--sidebar-foreground);
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
+           hover:bg-sidebar-accent hover:text-sidebar-accent-foreground
+           transition-all duration-150 cursor-pointer;
+  }
+
+  .sidebar-item.active {
+    background-color: var(--sidebar-accent);
+    color: var(--sidebar-accent-foreground);
+  }
+
+  /* Loading skeleton */
+  .skeleton {
+    @apply animate-pulse bg-slate-700 rounded;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary-400 to-blue-300 bg-clip-text text-transparent;
+  }
+
+  .glass {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    @apply bg-white/5 border border-white/10;
+  }
+
+  /* Animations */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+
+  .animate-slide-in {
+    animation: slideIn 0.25s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Custom scrollbar for specific elements */
+  .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+  .custom-scrollbar::-webkit-scrollbar-track { @apply bg-transparent; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { @apply bg-slate-700 rounded-full; }
+}

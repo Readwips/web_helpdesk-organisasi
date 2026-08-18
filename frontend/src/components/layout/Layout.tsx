@@ -1,0 +1,42 @@
+import { Outlet, useLocation } from 'react-router-dom';
+import Sidebar from './Sidebar';
+import Navbar from './Navbar';
+
+const pageTitles: Record<string, { title: string; subtitle: string }> = {
+  '/': { title: 'Dashboard', subtitle: 'Monitoring, Analysis & SLA Management' },
+  '/tiket': { title: 'Kelola Tiket', subtitle: 'Manajemen tiket IT Support' },
+  '/data-tiket': { title: 'Data Tiket', subtitle: 'Seluruh dataset tiket' },
+  '/analisis': { title: 'Analisis', subtitle: 'Analisis keluhan dan teknisi' },
+  '/sla': { title: 'Kepatuhan SLA', subtitle: 'Monitoring Service Level Agreement' },
+  '/import': { title: 'Import Data', subtitle: 'Upload dan validasi data CSV/Excel' },
+  '/laporan': { title: 'Laporan', subtitle: 'Ringkasan dan ekspor laporan' },
+  '/pengaturan': { title: 'Pengaturan', subtitle: 'Manajemen akun dan profil' },
+};
+
+export default function Layout() {
+  const location = useLocation();
+
+  const getPageInfo = () => {
+    const path = location.pathname;
+    // Check exact match first, then partial match
+    if (pageTitles[path]) return pageTitles[path];
+    const partialMatch = Object.keys(pageTitles).find(key => key !== '/' && path.startsWith(key));
+    return partialMatch ? pageTitles[partialMatch] : { title: 'Helpdesk', subtitle: '' };
+  };
+
+  const { title, subtitle } = getPageInfo();
+
+  return (
+    <div className="flex h-screen bg-dark-bg overflow-hidden">
+      <Sidebar />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Navbar title={title} subtitle={subtitle} />
+        <main className="flex-1 overflow-y-auto p-6">
+          <div className="animate-fade-in">
+            <Outlet />
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
