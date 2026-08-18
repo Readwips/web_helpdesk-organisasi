@@ -1,0 +1,116 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(100)
+  email      String   @unique @db.VarChar(100)
+  password   String   @db.VarChar(255)
+  role       Role     @default(IT_SUPPORT)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Category {
+  id            Int            @id @default(autoincrement())
+  name          String         @unique @db.VarChar(50)
+  subcategories Subcategory[]
+  tickets       Ticket[]
+
+  @@map("categories")
+}
+
+model Subcategory {
+  id         Int      @id @default(autoincrement())
+  categoryId Int      @map("category_id")
+  name       String   @db.VarChar(100)
+  category   Category @relation(fields: [categoryId], references: [id])
+  tickets    Ticket[]
+
+  @@map("subcategories")
+}
+
+model Department {
+  id      Int      @id @default(autoincrement())
+  name    String   @unique @db.VarChar(100)
+  tickets Ticket[]
+
+  @@map("departments")
+}
+
+model Technician {
+  id      Int      @id @default(autoincrement())
+  name    String   @db.VarChar(100)
+  email   String   @unique @db.VarChar(100)
+  tickets Ticket[]
+
+  @@map("technicians")
+}
+
+model Ticket {
+  id               Int        @id @default(autoincrement())
+  ticketId         String     @unique @db.VarChar(20) @map("ticket_id")
+  requesterName    String     @db.VarChar(100) @map("requester_name")
+  departmentId     Int        @map("department_id")
+  location         String?    @db.VarChar(100)
+  categoryId       Int        @map("category_id")
+  subcategoryId    Int?       @map("subcategory_id")
+  issue            String     @db.VarChar(200)
+  description      String?    @db.Text
+  priority         Priority
+  status           Status     @default(OPEN)
+  technicianId     Int?       @map("technician_id")
+  slaTarget        Int        @map("sla_target") // dalam jam
+  resolutionTime   Float?     @map("resolution_time") // dalam jam
+  slaStatus        SlaStatus  @default(PENDING) @map("sla_status")
+  satisfaction     Int?       // 1-5
+  resolutionNotes  String?    @db.Text @map("resolution_notes")
+  createdAt        DateTime   @default(now()) @map("created_at")
+  updatedAt        DateTime   @updatedAt @map("updated_at")
+  resolvedAt       DateTime?  @map("resolved_at")
+
+  department   Department  @relation(fields: [departmentId], references: [id])
+  category     Category    @relation(fields: [categoryId], references: [id])
+  subcategory  Subcategory? @relation(fields: [subcategoryId], references: [id])
+  technician   Technician? @relation(fields: [technicianId], references: [id])
+
+  @@map("tickets")
+}
+
+enum Role {
+  ADMIN
+  IT_SUPPORT
+  MANAGER
+}
+
+enum Priority {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum Status {
+  OPEN
+  IN_PROGRESS
+  PENDING
+  RESOLVED
+  CLOSED
+}
+
+enum SlaStatus {
+  MET
+  BREACHED
+  PENDING
+}
