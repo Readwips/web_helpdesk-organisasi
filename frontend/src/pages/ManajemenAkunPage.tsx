@@ -53,6 +53,11 @@ export default function ManajemenAkunPage() {
   const [newUserForm, setNewUserForm] = useState({ name: '', email: '', password: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Edit Technician Name state
+  const [editTechUser, setEditTechUser] = useState<User | null>(null);
+  const [editTechName, setEditTechName] = useState('');
+  const [isEditingTech, setIsEditingTech] = useState(false);
+
   useEffect(() => {
     if (activeTab === 'daftar') {
       fetchUsers();
@@ -114,6 +119,22 @@ export default function ManajemenAkunPage() {
       toast.error(error?.response?.data?.message || 'Gagal membuat akun');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleUpdateTechnicianName = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editTechUser || !editTechName.trim()) return;
+    setIsEditingTech(true);
+    try {
+      await userService.update(editTechUser.id, { technicianName: editTechName.trim() });
+      toast.success('Nama teknisi berhasil diperbarui');
+      setEditTechUser(null);
+      fetchUsers();
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || 'Gagal memperbarui nama teknisi');
+    } finally {
+      setIsEditingTech(false);
     }
   };
 
@@ -201,6 +222,12 @@ export default function ManajemenAkunPage() {
                       </span>
                     </div>
                     <div className="flex justify-between items-center py-1 border-b" style={{ borderColor: 'var(--border)' }}>
+                      <span>Nama Teknisi</span>
+                      <span className="font-medium" style={{ color: 'var(--foreground)' }}>
+                        {(u as any).technicianName || <span className="italic text-xs opacity-50">Belum diset</span>}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-1 border-b" style={{ borderColor: 'var(--border)' }}>
                       <span>Total Login</span>
                       <span className="font-medium" style={{ color: 'var(--foreground)' }}>{u._count?.activityLogs || 0}x</span>
                     </div>
@@ -211,8 +238,18 @@ export default function ManajemenAkunPage() {
                   </div>
 
                   <div className="mt-5 flex gap-2">
+                    {currentUser?.role === 'ADMIN' && (
+                      <button
+                        className="btn-secondary py-1.5 text-xs justify-center"
+                        style={{ flex: 1 }}
+                        onClick={() => { setEditTechUser(u); setEditTechName((u as any).technicianName || u.name); }}
+                      >
+                        ✏️ Edit Teknisi
+                      </button>
+                    )}
                     <button 
-                      className="btn-secondary flex-1 py-1.5 text-xs justify-center"
+                      className="btn-secondary py-1.5 text-xs justify-center"
+                      style={{ flex: 1 }}
                       onClick={() => {
                         setLogFilterUser(u.id);
                         setActiveTab('log');
@@ -394,6 +431,59 @@ export default function ManajemenAkunPage() {
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? 'Menyimpan...' : 'Buat Akun'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Edit Nama Teknisi */}
+      {editTechUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+          <div className="card w-full max-w-sm p-6 shadow-2xl animate-scale-in">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-lg font-bold" style={{ color: 'var(--foreground)' }}>Edit Nama Teknisi</h2>
+              <button 
+                onClick={() => setEditTechUser(null)}
+                className="p-1 rounded-md hover:bg-muted"
+                style={{ color: 'var(--muted-foreground)' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <p className="text-sm mb-4" style={{ color: 'var(--muted-foreground)' }}>
+              Mengubah nama teknisi untuk akun: <strong style={{ color: 'var(--foreground)' }}>{editTechUser.name}</strong>
+            </p>
+
+            <form onSubmit={handleUpdateTechnicianName} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--foreground)' }}>Nama Teknisi Baru</label>
+                <input 
+                  type="text" 
+                  className="input" 
+                  value={editTechName}
+                  onChange={(e) => setEditTechName(e.target.value)}
+                  placeholder="Contoh: Andi Pratama"
+                  required
+                />
+              </div>
+              
+              <div className="pt-2 flex gap-3">
+                <button 
+                  type="button" 
+                  className="btn-secondary flex-1 justify-center"
+                  onClick={() => setEditTechUser(null)}
+                >
+                  Batal
+                </button>
+                <button 
+                  type="submit" 
+                  className="btn-primary flex-1 justify-center"
+                  disabled={isEditingTech}
+                >
+                  {isEditingTech ? 'Menyimpan...' : 'Simpan'}
                 </button>
               </div>
             </form>

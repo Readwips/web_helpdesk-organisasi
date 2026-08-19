@@ -135,12 +135,12 @@ export const getTicketById = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-export const createTicket = async (req: Request & { user?: { id: number } }, res: Response): Promise<void> => {
+export const createTicket = async (req: Request & { user?: { id: number; role: string } }, res: Response): Promise<void> => {
   try {
     const {
       requesterName, departmentId, location,
       categoryId, subcategoryId, issue, description,
-      priority, technicianId, resolutionNotes,
+      priority, resolutionNotes,
     } = req.body;
 
     if (!requesterName || !departmentId || !categoryId || !issue || !priority) {
@@ -152,6 +152,18 @@ export const createTicket = async (req: Request & { user?: { id: number } }, res
     const count = await prisma.ticket.count();
     const ticketId = `TKT-${new Date().getFullYear()}-${String(count + 1).padStart(4, '0')}`;
     const slaTarget = getSlaTarget(priority.toUpperCase());
+
+    // Auto-assign technician based on who is logged in
+    let resolvedTechnicianId: number | null = null;
+    if (req.user?.role === 'IT_SUPPORT') {
+      // Find the technician linked to this user account
+      const userWithTech = await prisma.user.findUnique({
+        where: { id: req.user.id },
+        select: { technicianId: true },
+      });
+      resolvedTechnicianId = userWithTech?.technicianId ?? null;
+    }
+    // Admin/Manager → Belum Diassign (null)
 
     const ticket = await prisma.ticket.create({
       data: {
@@ -165,7 +177,7 @@ export const createTicket = async (req: Request & { user?: { id: number } }, res
         description,
         priority: priority.toUpperCase() as 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW',
         status: 'OPEN',
-        technicianId: technicianId ? parseInt(technicianId) : null,
+        technicianId: resolvedTechnicianId,
         slaTarget,
         slaStatus: 'PENDING',
         resolutionNotes,
@@ -189,7 +201,7 @@ export const createTicket = async (req: Request & { user?: { id: number } }, res
   }
 };
 
-export const updateTicket = async (req: Request & { user?: { id: number } }, res: Response): Promise<void> => {
+export const updateTicket = async (req: Request & { user?: { id: number; role: string } }, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const {
@@ -228,6 +240,17 @@ export const updateTicket = async (req: Request & { user?: { id: number } }, res
       const resolutionTime = calculateResolutionTime(existingTicket.createdAt, resolvedAt);
       updateData.resolutionTime = resolutionTime;
       updateData.slaStatus = calculateSlaStatus(resolutionTime, existingTicket.slaTarget, newStatus);
+    }
+
+    // Auto-assign technician when IT_SUPPORT updates a ticket
+    if (req.user?.role === 'IT_SUPPORT') {
+      const userWithTech = await prisma.user.findUnique({
+        where: { id: req.user.id },
+        select: { technicianId: true, name: true },
+      });
+      if (userWithTech?.technicianId) {
+        updateData.technicianId = userWithTech.technicianId;
+      }
     }
 
     const updated = await prisma.ticket.update({

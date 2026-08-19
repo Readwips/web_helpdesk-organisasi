@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Modal from '../ui/Modal';
 import { Ticket, Category, Subcategory, Department, Technician } from '../../types';
 import { ticketService, masterService } from '../../services';
+import { useAuthStore } from '../../store/authStore';
 import toast from 'react-hot-toast';
 
 interface TicketFormModalProps {
@@ -19,6 +20,8 @@ export default function TicketFormModal({
 }: TicketFormModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
+  const { user } = useAuthStore();
+  const isITSupport = user?.role === 'IT_SUPPORT';
   
   const isEdit = !!ticket;
 
@@ -188,17 +191,31 @@ export default function TicketFormModal({
               <option value="CRITICAL">Critical</option>
             </select>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1.5">Assign ke Teknisi</label>
-            <select
-              className="select"
-              value={formData.technicianId || ''}
-              onChange={e => setFormData({ ...formData, technicianId: Number(e.target.value) || undefined })}
-            >
-              <option value="">Belum Diassign</option>
-              {technicians.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-            </select>
-          </div>
+
+          {/* Only show technician assign for Admin/Manager — IT_SUPPORT is auto-assigned */}
+          {!isITSupport ? (
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">Assign ke Teknisi</label>
+              <select
+                className="select"
+                value={formData.technicianId || ''}
+                onChange={e => setFormData({ ...formData, technicianId: Number(e.target.value) || undefined })}
+              >
+                <option value="">Belum Diassign</option>
+                {technicians.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+              </select>
+            </div>
+          ) : (
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">Assign ke Teknisi</label>
+              <div className="flex items-center gap-2 h-[42px] px-3 rounded-lg" style={{ background: 'var(--muted)', border: '1px solid var(--border)' }}>
+                <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>👤</span>
+                <span className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>
+                  Otomatis — akun Anda
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {isEdit && (

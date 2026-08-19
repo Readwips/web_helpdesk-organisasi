@@ -14,6 +14,10 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
         email: true,
         role: true,
         createdAt: true,
+        technicianId: true,
+        technician: {
+          select: { id: true, name: true }
+        },
         _count: {
           select: { activityLogs: { where: { action: 'LOGIN' } } }
         }
@@ -21,7 +25,13 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
       orderBy: { name: 'asc' },
     });
 
-    res.json({ success: true, data: users });
+    // Flatten technicianName for easier consumption
+    const result = users.map(u => ({
+      ...u,
+      technicianName: u.technician?.name ?? null,
+    }));
+
+    res.json({ success: true, data: result });
   } catch (error) {
     console.error('GetUsers error:', error);
     res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server.' });
@@ -118,7 +128,7 @@ export const createUser = async (req: Request & { user?: { id: number } }, res: 
 export const updateUser = async (req: Request & { user?: { id: number } }, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { name, email, password } = req.body;
+    const { name, email, password, technicianName } = req.body;
 
     const existingUser = await prisma.user.findUnique({ where: { id: parseInt(id) } });
     if (!existingUser) {
@@ -139,6 +149,33 @@ export const updateUser = async (req: Request & { user?: { id: number } }, res: 
     if (email) updateData.email = email;
     if (password) {
       updateData.password = await bcrypt.hash(password, 12);
+    }
+
+    // If technicianName is provided, update the linked Technician record
+    if (technicianName) {
+      const linkedTech = await prisma.technician.findFirst({
+        where: { user: { id: parseInt(id) } },
+      });
+      if (linkedTech) {
+        await prisma.technician.update({
+          where: { id: linkedTech.id },
+          data: { name: technicianName },
+        });
+        if (req.user) {
+          await logActivity(
+            req.user.id,
+            'UPDATE_USER',
+            `Mengubah nama teknisi akun ${existingUser.name} menjadi "${technicianName}"`,
+            { targetUserId: parseInt(id), technicianName },
+            req.ip
+          );
+        }
+        res.json({ success: true, message: 'Nama teknisi berhasil diperbarui.' });
+        return;
+      } else {
+        res.status(404).json({ success: false, message: 'Akun ini belum memiliki teknisi terhubung.' });
+        return;
+      }
     }
 
     const updatedUser = await prisma.user.update({
