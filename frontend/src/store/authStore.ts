@@ -6,6 +6,7 @@ interface AuthStore extends AuthState {
   login: (user: User, token: string) => void;
   logout: () => void;
   setLoading: (loading: boolean) => void;
+  updateUser: (updates: Partial<User>) => void;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -23,6 +24,9 @@ export const useAuthStore = create<AuthStore>()(
         set({ user: null, token: null, isAuthenticated: false }),
 
       setLoading: (loading: boolean) => set({ isLoading: loading }),
+
+      updateUser: (updates: Partial<User>) =>
+        set((state) => ({ user: state.user ? { ...state.user, ...updates } : state.user })),
     }),
     {
       name: 'it-helpdesk-auth',

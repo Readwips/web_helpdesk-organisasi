@@ -1,4 +1,5 @@
 import { Outlet, useLocation } from 'react-router-dom';
+import { useState } from 'react';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 
@@ -15,10 +16,10 @@ const pageTitles: Record<string, { title: string; subtitle: string }> = {
 
 export default function Layout() {
   const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const getPageInfo = () => {
     const path = location.pathname;
-    // Check exact match first, then partial match
     if (pageTitles[path]) return pageTitles[path];
     const partialMatch = Object.keys(pageTitles).find(key => key !== '/' && path.startsWith(key));
     return partialMatch ? pageTitles[partialMatch] : { title: 'Helpdesk', subtitle: '' };
@@ -27,11 +28,11 @@ export default function Layout() {
   const { title, subtitle } = getPageInfo();
 
   return (
-    <div className="flex h-screen bg-dark-bg overflow-hidden">
-      <Sidebar />
+    <div className="flex h-screen overflow-hidden" style={{ background: 'var(--background)' }}>
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Navbar title={title} subtitle={subtitle} />
-        <main className="flex-1 overflow-y-auto p-6">
+        <Navbar title={title} subtitle={subtitle} onMenuToggle={() => setSidebarOpen(true)} />
+        <main className="flex-1 overflow-y-auto p-4 md:p-6">
           <div className="animate-fade-in">
             <Outlet />
           </div>

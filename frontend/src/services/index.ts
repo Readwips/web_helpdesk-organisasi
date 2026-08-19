@@ -102,4 +102,24 @@ export const authService = {
 
   getMe: () =>
     api.get('/auth/me'),
+
+  changePassword: (currentPassword: string, newPassword: string) =>
+    api.put('/auth/change-password', { currentPassword, newPassword }),
+
+  updateProfile: (name: string, email: string) =>
+    api.put('/auth/profile', { name, email }),
+};
+
+export const userService = {
+  getAll: () =>
+    api.get('/users'),
+
+  getActivity: (id: number | 'all', params?: { page?: number; limit?: number; action?: string }) =>
+    api.get(`/users/${id}/activity`, { params }),
+
+  create: (data: any) =>
+    api.post('/users', data),
+
+  update: (id: number, data: any) =>
+    api.put(`/users/${id}`, data),
 };

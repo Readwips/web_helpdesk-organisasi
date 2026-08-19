@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import {
-  Search, Plus, Filter, Calendar, Edit, Trash2, ShieldAlert
+  Search, Plus, Filter, Edit, Trash2, ShieldAlert
 } from 'lucide-react';
 import { ticketService, masterService } from '../services';
 import { Ticket, TicketFilters, Category, Department, Technician } from '../types';
@@ -9,6 +9,9 @@ import { id as localeId } from 'date-fns/locale';
 import toast from 'react-hot-toast';
 import TicketDetailModal from '../components/ticket/TicketDetailModal';
 import TicketFormModal from '../components/ticket/TicketFormModal';
+import EmptyState from '../components/ui/EmptyState';
+import { useAuthStore } from '../store/authStore';
+import { PERMISSIONS, hasPermission } from '../utils/permissions';
 
 const statusClass: Record<string, string> = {
   OPEN: 'badge-open', IN_PROGRESS: 'badge-in-progress',
@@ -21,6 +24,11 @@ const priorityClass: Record<string, string> = {
 };
 
 export default function KelolaTiketPage() {
+  const { user } = useAuthStore();
+  const canCreate = hasPermission(user?.role, PERMISSIONS.ACTION_CREATE_TICKET);
+  const canEdit   = hasPermission(user?.role, PERMISSIONS.ACTION_EDIT_TICKET);
+  const canDelete = hasPermission(user?.role, PERMISSIONS.ACTION_DELETE_TICKET);
+
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [filters, setFilters] = useState<TicketFilters>({ page: 1, limit: 12, status: 'OPEN,IN_PROGRESS,PENDING' });
   const [isLoading, setIsLoading] = useState(false);
@@ -92,15 +100,17 @@ export default function KelolaTiketPage() {
           >
             <Filter size={16} /> Filter
           </button>
-          <button 
-            className="btn-primary"
-            onClick={() => {
-              setSelectedTicket(null);
-              setIsFormOpen(true);
-            }}
-          >
-            <Plus size={16} /> Buat Tiket
-          </button>
+          {canCreate && (
+            <button 
+              className="btn-primary"
+              onClick={() => {
+                setSelectedTicket(null);
+                setIsFormOpen(true);
+              }}
+            >
+              <Plus size={16} /> Buat Tiket
+            </button>
+          )}
         </div>
       </div>
 
@@ -157,9 +167,13 @@ export default function KelolaTiketPage() {
             <div key={i} className="card p-5 h-48 skeleton" />
           ))
         ) : tickets.length === 0 ? (
-          <div className="col-span-full card p-12 flex flex-col items-center justify-center text-slate-500">
-            <ShieldAlert size={48} className="mb-4 opacity-50" />
-            <p>Tidak ada tiket aktif ditemukan.</p>
+          <div className="col-span-full">
+            <EmptyState
+              title="Tidak Ada Tiket Aktif"
+              description="Semua tiket sudah selesai atau belum ada tiket yang dibuat. Buat tiket baru untuk memulai."
+              icon={ShieldAlert}
+              action={{ label: '+ Buat Tiket', onClick: () => { setSelectedTicket(null); setIsFormOpen(true); } }}
+            />
           </div>
         ) : (
           tickets.map((ticket: Ticket) => (
@@ -172,7 +186,8 @@ export default function KelolaTiketPage() {
               </div>
               
               <h3 
-                className="text-white font-medium mb-1 line-clamp-2 text-sm cursor-pointer hover:text-primary-400 transition-colors" 
+                className="font-medium mb-1 line-clamp-2 text-sm cursor-pointer hover:text-primary-400 transition-colors" 
+                style={{ color: 'var(--foreground)' }}
                 title={ticket.issue}
                 onClick={() => {
                   setSelectedTicket(ticket);
@@ -181,52 +196,56 @@ export default function KelolaTiketPage() {
               >
                 {ticket.issue}
               </h3>
-              <div className="text-xs text-slate-400 mb-4 flex-1">
+              <div className="text-xs mb-4 flex-1" style={{ color: 'var(--muted-foreground)' }}>
                 {ticket.category?.name}
               </div>
 
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-500">Requester</span>
-                  <span className="text-slate-300">{ticket.requesterName}</span>
+                  <span style={{ color: 'var(--muted-foreground)' }}>Requester</span>
+                  <span style={{ color: 'var(--foreground)' }}>{ticket.requesterName}</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-500">Prioritas</span>
+                  <span style={{ color: 'var(--muted-foreground)' }}>Prioritas</span>
                   <span className={priorityClass[ticket.priority]}>{ticket.priority}</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-500">Dibuat</span>
-                  <span className="text-slate-300">{format(new Date(ticket.createdAt), 'dd MMM yy HH:mm')}</span>
+                  <span style={{ color: 'var(--muted-foreground)' }}>Dibuat</span>
+                  <span style={{ color: 'var(--foreground)' }}>{format(new Date(ticket.createdAt), 'dd MMM yy HH:mm')}</span>
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-dark-border flex gap-2">
-                <button 
-                  className="flex-1 btn-primary py-1.5 text-xs justify-center"
-                  onClick={() => {
-                    setSelectedTicket(ticket);
-                    setIsFormOpen(true);
-                  }}
-                >
-                  <Edit size={14} /> Update
-                </button>
-                <button 
-                  className="btn-secondary px-2 py-1.5" 
-                  title="Hapus"
-                  onClick={async () => {
-                    if (window.confirm('Yakin ingin menghapus tiket ini?')) {
-                      try {
-                        await ticketService.delete(ticket.id);
-                        toast.success('Tiket berhasil dihapus');
-                        fetchTickets();
-                      } catch (e) {
-                        toast.error('Gagal menghapus tiket');
+              <div className="pt-3 border-t flex gap-2" style={{ borderColor: 'var(--border)' }}>
+                {canEdit && (
+                  <button 
+                    className="flex-1 btn-primary py-1.5 text-xs justify-center"
+                    onClick={() => {
+                      setSelectedTicket(ticket);
+                      setIsFormOpen(true);
+                    }}
+                  >
+                    <Edit size={14} /> Update
+                  </button>
+                )}
+                {canDelete && (
+                  <button 
+                    className="btn-secondary px-2 py-1.5" 
+                    title="Hapus Tiket"
+                    onClick={async () => {
+                      if (window.confirm('Yakin ingin menghapus tiket ini?')) {
+                        try {
+                          await ticketService.delete(ticket.id);
+                          toast.success('Tiket berhasil dihapus');
+                          fetchTickets();
+                        } catch (e) {
+                          toast.error('Gagal menghapus tiket');
+                        }
                       }
-                    }
-                  }}
-                >
-                  <Trash2 size={14} className="text-red-400" />
-                </button>
+                    }}
+                  >
+                    <Trash2 size={14} className="text-red-400" />
+                  </button>
+                )}
               </div>
             </div>
           ))

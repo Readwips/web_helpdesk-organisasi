@@ -1,18 +1,18 @@
-import { Bell, Search, Sun, Moon } from 'lucide-react';
+import { Bell, Search, Sun, Moon, Menu } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../store/authStore';
 
 interface NavbarProps {
   title: string;
   subtitle?: string;
+  onMenuToggle?: () => void;
 }
 
-export default function Navbar({ title, subtitle }: NavbarProps) {
+export default function Navbar({ title, subtitle, onMenuToggle }: NavbarProps) {
   const { user } = useAuthStore();
   const [isDarkMode, setIsDarkMode] = useState(true);
 
   useEffect(() => {
-    // Check initial state
     setIsDarkMode(document.documentElement.classList.contains('dark'));
   }, []);
 
@@ -30,35 +30,80 @@ export default function Navbar({ title, subtitle }: NavbarProps) {
   };
 
   return (
-    <header className="h-16 bg-dark-surface border-b border-dark-border flex items-center justify-between px-6">
-      {/* Title */}
-      <div>
-        <h2 className="text-lg font-semibold text-white leading-tight">{title}</h2>
-        {subtitle && <p className="text-xs text-slate-500">{subtitle}</p>}
+    <header
+      className="h-14 md:h-16 border-b flex items-center justify-between px-4 md:px-6 shrink-0"
+      style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
+    >
+      {/* Left: hamburger + title */}
+      <div className="flex items-center gap-3">
+        {/* Hamburger (mobile only) */}
+        <button
+          onClick={onMenuToggle}
+          className="lg:hidden p-2 rounded-lg transition-colors"
+          style={{ color: 'var(--muted-foreground)' }}
+          aria-label="Buka menu"
+        >
+          <Menu size={20} />
+        </button>
+
+        <div>
+          <h2
+            className="text-base md:text-lg font-semibold leading-tight"
+            style={{ color: 'var(--foreground)' }}
+          >
+            {title}
+          </h2>
+          {subtitle && (
+            <p className="text-xs hidden sm:block" style={{ color: 'var(--muted-foreground)' }}>
+              {subtitle}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Right */}
-      <div className="flex items-center gap-3">
-        {/* Search hint */}
-        <div className="hidden md:flex items-center gap-2 bg-dark-bg border border-dark-border rounded-lg px-3 py-1.5 text-sm text-slate-500">
+      <div className="flex items-center gap-2">
+        {/* Search hint — desktop only */}
+        <div
+          className="hidden md:flex items-center gap-2 border rounded-lg px-3 py-1.5 text-sm"
+          style={{
+            background: 'var(--background)',
+            borderColor: 'var(--border)',
+            color: 'var(--muted-foreground)',
+          }}
+        >
           <Search size={14} />
           <span>Ctrl+K untuk pencarian</span>
         </div>
 
         {/* Notification */}
-        <button className="relative p-2 rounded-lg hover:bg-dark-border text-slate-400 hover:text-white transition-colors">
+        <button
+          className="relative p-2 rounded-lg transition-colors"
+          style={{ color: 'var(--muted-foreground)' }}
+          title="Notifikasi"
+        >
           <Bell size={18} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
         </button>
 
         {/* Theme Toggle */}
-        <button 
+        <button
           onClick={toggleTheme}
-          className="p-2 rounded-lg hover:bg-dark-border text-slate-400 hover:text-white transition-colors"
-          title="Toggle Theme"
+          className="p-2 rounded-lg transition-colors"
+          style={{ color: 'var(--muted-foreground)' }}
+          title={isDarkMode ? 'Mode Terang' : 'Mode Gelap'}
         >
           {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
         </button>
+
+        {/* User Avatar (desktop) */}
+        <div
+          className="hidden sm:flex w-8 h-8 rounded-full items-center justify-center text-sm font-bold text-white ml-1"
+          style={{ background: 'var(--primary)' }}
+          title={user?.name}
+        >
+          {user?.name?.charAt(0).toUpperCase() || 'U'}
+        </div>
       </div>
     </header>
   );

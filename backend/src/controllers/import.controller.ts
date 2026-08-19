@@ -6,6 +6,7 @@ import csvParser from 'csv-parser';
 import ExcelJS from 'exceljs';
 import prisma from '../lib/prisma';
 import { getSlaTarget, calculateResolutionTime, calculateSlaStatus } from '../utils/sla.utils';
+import { logActivity } from '../utils/activityLogger';
 
 // Multer setup
 const storage = multer.diskStorage({
@@ -174,7 +175,7 @@ export const validateImport = async (req: Request, res: Response): Promise<void>
   }
 };
 
-export const executeImport = async (req: Request, res: Response): Promise<void> => {
+export const executeImport = async (req: Request & { user?: { id: number } }, res: Response): Promise<void> => {
   try {
     const { rows } = req.body as { rows: ImportRow[] };
 
@@ -264,6 +265,10 @@ export const executeImport = async (req: Request, res: Response): Promise<void> 
       } catch {
         failed++;
       }
+    }
+
+    if (req.user && imported > 0) {
+      await logActivity(req.user.id, 'IMPORT_DATA', `Mengimpor ${imported} data tiket`, { imported, failed }, req.ip);
     }
 
     res.json({

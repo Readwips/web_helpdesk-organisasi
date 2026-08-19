@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
 import ExcelJS from 'exceljs';
 import { getSlaTarget, calculateResolutionTime, calculateSlaStatus } from '../utils/sla.utils';
+import { logActivity } from '../utils/activityLogger';
 
 interface TicketQuery {
   page?: string;
@@ -134,7 +135,7 @@ export const getTicketById = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-export const createTicket = async (req: Request, res: Response): Promise<void> => {
+export const createTicket = async (req: Request & { user?: { id: number } }, res: Response): Promise<void> => {
   try {
     const {
       requesterName, departmentId, location,
@@ -177,6 +178,10 @@ export const createTicket = async (req: Request, res: Response): Promise<void> =
       },
     });
 
+    if (req.user) {
+      await logActivity(req.user.id, 'CREATE_TICKET', `Membuat tiket baru ${ticketId}`, { ticketId: ticket.id }, req.ip);
+    }
+
     res.status(201).json({ success: true, message: 'Tiket berhasil dibuat.', data: ticket });
   } catch (error) {
     console.error('CreateTicket error:', error);
@@ -184,7 +189,7 @@ export const createTicket = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-export const updateTicket = async (req: Request, res: Response): Promise<void> => {
+export const updateTicket = async (req: Request & { user?: { id: number } }, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const {
@@ -236,6 +241,11 @@ export const updateTicket = async (req: Request, res: Response): Promise<void> =
       },
     });
 
+    if (req.user) {
+      const statusText = status ? ` status → ${status.toUpperCase().replace(' ', '_')}` : '';
+      await logActivity(req.user.id, 'UPDATE_TICKET', `Update tiket ${existingTicket.ticketId}${statusText}`, { ticketId: existingTicket.id, updates: updateData }, req.ip);
+    }
+
     res.json({ success: true, message: 'Tiket berhasil diupdate.', data: updated });
   } catch (error) {
     console.error('UpdateTicket error:', error);
@@ -243,10 +253,16 @@ export const updateTicket = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-export const deleteTicket = async (req: Request, res: Response): Promise<void> => {
+export const deleteTicket = async (req: Request & { user?: { id: number } }, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    await prisma.ticket.delete({ where: { id: parseInt(String(id)) } });
+    const existingTicket = await prisma.ticket.findUnique({ where: { id: parseInt(String(id)) } });
+    if (existingTicket) {
+      await prisma.ticket.delete({ where: { id: parseInt(String(id)) } });
+      if (req.user) {
+        await logActivity(req.user.id, 'DELETE_TICKET', `Menghapus tiket ${existingTicket.ticketId}`, { ticketId: existingTicket.id }, req.ip);
+      }
+    }
     res.json({ success: true, message: 'Tiket berhasil dihapus.' });
   } catch (error) {
     console.error('DeleteTicket error:', error);

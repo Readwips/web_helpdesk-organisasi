@@ -11,6 +11,10 @@ import AnalisisPage from './pages/AnalisisPage';
 import ImportPage from './pages/ImportPage';
 import LaporanPage from './pages/LaporanPage';
 import PlaceholderPage from './components/ui/PlaceholderPage';
+import PengaturanPage from './pages/PengaturanPage';
+import ManajemenAkunPage from './pages/ManajemenAkunPage';
+import { PERMISSIONS, hasPermission } from './utils/permissions';
+
 
 // Route guard
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -23,20 +27,30 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
   return isAuthenticated ? <Navigate to="/" replace /> : <>{children}</>;
 }
 
+// Guard for pages with role restrictions — redirects to / if no access
+function RoleRoute({ children, roles }: { children: React.ReactNode; roles: string[] }) {
+  const { user } = useAuthStore();
+  return hasPermission(user?.role, roles as any)
+    ? <>{children}</>
+    : <Navigate to="/" replace />;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <Toaster
         position="top-right"
         toastOptions={{
+          duration: 3000,
           style: {
-            background: '#1e293b',
-            color: '#e2e8f0',
-            border: '1px solid #334155',
+            background: 'var(--card)',
+            color: 'var(--foreground)',
+            border: '1px solid var(--border)',
             borderRadius: '10px',
+            fontSize: '14px',
           },
-          success: { iconTheme: { primary: '#10b981', secondary: '#1e293b' } },
-          error: { iconTheme: { primary: '#ef4444', secondary: '#1e293b' } },
+          success: { iconTheme: { primary: '#10b981', secondary: 'var(--card)' } },
+          error: { iconTheme: { primary: '#ef4444', secondary: 'var(--card)' } },
         }}
       />
 
@@ -52,24 +66,44 @@ export default function App() {
         }>
           <Route index element={<DashboardPage />} />
 
-          <Route path="/tiket" element={<KelolaTiketPage />} />
+          <Route path="/tiket" element={
+            <RoleRoute roles={PERMISSIONS.PAGE_KELOLA_TIKET as unknown as string[]}>
+              <KelolaTiketPage />
+            </RoleRoute>
+          } />
 
-          <Route path="/data-tiket" element={<DataTiketPage />} />
+          <Route path="/data-tiket" element={
+            <RoleRoute roles={PERMISSIONS.PAGE_DATA_TIKET as unknown as string[]}>
+              <DataTiketPage />
+            </RoleRoute>
+          } />
 
-          <Route path="/analisis" element={<AnalisisPage />} />
+          <Route path="/analisis" element={
+            <RoleRoute roles={PERMISSIONS.PAGE_ANALISIS as unknown as string[]}>
+              <AnalisisPage />
+            </RoleRoute>
+          } />
 
           <Route path="/sla" element={<SlaPage />} />
 
-          <Route path="/import" element={<ImportPage />} />
+          <Route path="/import" element={
+            <RoleRoute roles={PERMISSIONS.PAGE_IMPORT as unknown as string[]}>
+              <ImportPage />
+            </RoleRoute>
+          } />
 
-          <Route path="/laporan" element={<LaporanPage />} />
+          <Route path="/laporan" element={
+            <RoleRoute roles={PERMISSIONS.PAGE_LAPORAN as unknown as string[]}>
+              <LaporanPage />
+            </RoleRoute>
+          } />
 
-          <Route path="/pengaturan" element={
-            <PlaceholderPage
-              title="Pengaturan"
-              description="Manajemen profil dan akun pengguna."
-              phase="Phase 6 — Polish"
-            />
+          <Route path="/pengaturan" element={<PengaturanPage />} />
+          
+          <Route path="/manajemen-akun" element={
+            <RoleRoute roles={PERMISSIONS.PAGE_MANAJEMEN_AKUN as unknown as string[]}>
+              <ManajemenAkunPage />
+            </RoleRoute>
           } />
         </Route>
 

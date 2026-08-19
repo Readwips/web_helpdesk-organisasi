@@ -3,7 +3,21 @@ export interface User {
   name: string;
   email: string;
   role: 'ADMIN' | 'IT_SUPPORT' | 'MANAGER';
+  createdAt?: string;
+  _count?: {
+    activityLogs?: number;
+  };
+}
+
+export interface ActivityLog {
+  id: number;
+  userId: number;
+  action: string;
+  description: string;
+  metadata?: any;
+  ipAddress?: string;
   createdAt: string;
+  user?: Pick<User, 'id' | 'name' | 'email' | 'role'>;
 }
 
 export interface Category {

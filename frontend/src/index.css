@@ -260,8 +260,9 @@
   }
 
   .sidebar-item.active {
-    background-color: var(--sidebar-accent);
-    color: var(--sidebar-accent-foreground);
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    opacity: 0.9;
   }
 
   /* Loading skeleton */
