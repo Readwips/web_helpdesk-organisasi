@@ -74,7 +74,7 @@ export default function Navbar({ title, subtitle, onMenuToggle }: NavbarProps) {
           }}
         >
           <Search size={14} />
-          <span>Ctrl+K untuk pencarian</span>
+          <span>Pencarian</span>
         </button>
 
         {/* Notification */}
