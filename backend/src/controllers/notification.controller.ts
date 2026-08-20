@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
-import { AuthRequest } from '../middleware/authenticate';
+import { AuthRequest } from '../middleware/auth.middleware';
 
 // GET /api/notifications
 export const getNotifications = async (req: AuthRequest, res: Response): Promise<void> => {
