@@ -88,7 +88,7 @@ export default function GlobalSearchModal() {
     <>
       {/* Search Modal overlay */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-background p-4">
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-black/60 backdrop-blur-sm p-4">
           <div 
             className="w-full max-w-2xl bg-card border border-border rounded-xl shadow-2xl overflow-hidden flex flex-col animate-fade-in"
             onClick={(e) => e.stopPropagation()}
