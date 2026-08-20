@@ -64,8 +64,9 @@ export default function Navbar({ title, subtitle, onMenuToggle }: NavbarProps) {
       {/* Right */}
       <div className="flex items-center gap-2">
         {/* Search hint — desktop only */}
-        <div
-          className="hidden md:flex items-center gap-2 border rounded-lg px-3 py-1.5 text-sm"
+        <button
+          onClick={() => window.dispatchEvent(new CustomEvent('open-global-search'))}
+          className="hidden md:flex items-center gap-2 border rounded-lg px-3 py-1.5 text-sm transition-colors hover:bg-slate-800/50 cursor-pointer"
           style={{
             background: 'var(--background)',
             borderColor: 'var(--border)',
@@ -74,7 +75,7 @@ export default function Navbar({ title, subtitle, onMenuToggle }: NavbarProps) {
         >
           <Search size={14} />
           <span>Ctrl+K untuk pencarian</span>
-        </div>
+        </button>
 
         {/* Notification */}
         <button

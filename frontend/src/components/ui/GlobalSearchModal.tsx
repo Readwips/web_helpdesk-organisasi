@@ -16,7 +16,7 @@ export default function GlobalSearchModal() {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Keyboard shortcut listener
+  // Keyboard shortcut listener and custom event listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ctrl+K or Cmd+K
@@ -31,8 +31,15 @@ export default function GlobalSearchModal() {
       }
     };
 
+    const handleOpenEvent = () => setIsOpen(true);
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('open-global-search', handleOpenEvent);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('open-global-search', handleOpenEvent);
+    };
   }, [isOpen]);
 
   // Focus input when opened
