@@ -88,57 +88,57 @@ export default function GlobalSearchModal() {
     <>
       {/* Search Modal overlay */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-black/60 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-background p-4">
           <div 
-            className="w-full max-w-2xl bg-dark-card border border-dark-border rounded-xl shadow-2xl overflow-hidden flex flex-col animate-fade-in"
+            className="w-full max-w-2xl bg-card border border-border rounded-xl shadow-2xl overflow-hidden flex flex-col animate-fade-in"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Search Input */}
-            <div className="relative flex items-center border-b border-dark-border p-4">
-              <Search className="absolute left-6 text-slate-400" size={20} />
+            <div className="relative flex items-center border-b border-border p-4">
+              <Search className="absolute left-6 text-muted-foreground" size={20} />
               <input
                 ref={inputRef}
                 type="text"
-                className="w-full bg-transparent border-none outline-none pl-10 pr-10 text-lg text-slate-200 placeholder-slate-500"
+                className="w-full bg-input rounded-md outline-none pl-10 pr-10 py-3 text-lg text-foreground placeholder-muted-foreground"
                 placeholder="Cari ID tiket, keluhan, pemohon..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
               <button 
                 onClick={() => setIsOpen(false)}
-                className="absolute right-6 text-slate-400 hover:text-slate-200"
+                className="absolute right-6 text-muted-foreground hover:text-foreground"
               >
                 <X size={20} />
               </button>
             </div>
 
             {/* Results Area */}
-            <div className="max-h-[60vh] overflow-y-auto">
+            <div className="max-h-[60vh] overflow-y-auto bg-card">
               {isLoading ? (
-                <div className="p-8 text-center text-slate-500">Mencari...</div>
+                <div className="p-8 text-center text-muted-foreground">Mencari...</div>
               ) : query && results.length === 0 ? (
-                <div className="p-8 text-center text-slate-500">Tidak ada tiket yang cocok dengan "{query}"</div>
+                <div className="p-8 text-center text-muted-foreground">Tidak ada tiket yang cocok dengan "{query}"</div>
               ) : results.length > 0 ? (
                 <div className="p-2 space-y-1">
-                  <div className="px-4 py-2 text-xs font-semibold text-slate-500 uppercase">
+                  <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase">
                     Hasil Pencarian
                   </div>
                   {results.map((ticket) => (
                     <button
                       key={ticket.id}
                       onClick={() => handleResultClick(ticket)}
-                      className="w-full flex items-start gap-4 p-4 hover:bg-slate-800/50 rounded-lg transition-colors text-left"
+                      className="w-full flex items-start gap-4 p-4 bg-card hover:bg-accent rounded-lg transition-colors text-left"
                     >
-                      <div className="mt-1 w-8 h-8 rounded bg-primary-900/50 text-primary-400 flex items-center justify-center shrink-0">
+                      <div className="mt-1 w-8 h-8 rounded bg-primary/20 text-primary flex items-center justify-center shrink-0">
                         <TicketIcon size={16} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-mono text-xs text-primary-400">{ticket.ticketId}</span>
-                          <span className="text-xs text-slate-500 px-1.5 py-0.5 rounded bg-slate-800">{ticket.status}</span>
+                          <span className="font-mono text-xs text-primary">{ticket.ticketId}</span>
+                          <span className="text-xs text-muted-foreground px-1.5 py-0.5 rounded bg-muted">{ticket.status}</span>
                         </div>
-                        <h4 className="text-sm font-medium text-slate-200 truncate">{ticket.issue}</h4>
-                        <div className="text-xs text-slate-400 mt-1">
+                        <h4 className="text-sm font-medium text-foreground truncate">{ticket.issue}</h4>
+                        <div className="text-xs text-muted-foreground mt-1">
                           {ticket.requesterName} • {ticket.department?.name}
                         </div>
                       </div>
@@ -146,16 +146,16 @@ export default function GlobalSearchModal() {
                   ))}
                 </div>
               ) : (
-                <div className="p-8 text-center text-slate-500 text-sm">
+                <div className="p-8 text-center text-muted-foreground text-sm">
                   Ketik sesuatu untuk mencari data tiket secara global.
                 </div>
               )}
             </div>
             
             {/* Footer */}
-            <div className="p-3 border-t border-dark-border bg-slate-900/50 flex justify-between items-center text-xs text-slate-500">
+            <div className="p-3 border-t border-border bg-muted flex justify-between items-center text-xs text-muted-foreground">
               <div className="flex gap-4">
-                <span><kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 mr-1">ESC</kbd> untuk tutup</span>
+                <span><kbd className="px-1.5 py-0.5 rounded bg-background text-foreground mr-1 border">ESC</kbd> untuk tutup</span>
               </div>
             </div>
           </div>

@@ -49,14 +49,14 @@ export default function NotificationDropdown() {
       {/* Dropdown Panel */}
       {isOpen && (
         <div 
-          className="absolute right-0 mt-2 w-80 rounded-xl shadow-2xl border border-dark-border bg-dark-card overflow-hidden z-50 animate-fade-in"
+          className="absolute right-0 mt-2 w-80 rounded-xl shadow-2xl border border-dark-border bg-card overflow-hidden z-50 animate-fade-in"
         >
-          <div className="p-3 border-b border-dark-border flex items-center justify-between bg-slate-900/30">
-            <h3 className="font-semibold text-sm text-slate-200">Notifikasi</h3>
+          <div className="p-3 border-b border-dark-border flex items-center justify-between bg-muted">
+            <h3 className="font-semibold text-sm text-foreground">Notifikasi</h3>
             {unreadCount > 0 && (
               <button 
                 onClick={markAllAsRead}
-                className="text-xs text-primary-400 hover:text-primary-300 flex items-center gap-1"
+                className="text-xs text-primary hover:text-primary-400 flex items-center gap-1"
               >
                 <Check size={12} />
                 Tandai semua dibaca
@@ -64,9 +64,9 @@ export default function NotificationDropdown() {
             )}
           </div>
           
-          <div className="max-h-80 overflow-y-auto">
+          <div className="max-h-80 overflow-y-auto bg-card">
             {notifications.length === 0 ? (
-              <div className="p-6 text-center text-slate-500 flex flex-col items-center justify-center">
+              <div className="p-6 text-center text-muted-foreground flex flex-col items-center justify-center">
                 <Bell size={24} className="mb-2 opacity-20" />
                 <p className="text-sm">Tidak ada notifikasi</p>
               </div>
@@ -76,25 +76,25 @@ export default function NotificationDropdown() {
                   <button
                     key={notif.id}
                     onClick={() => handleNotificationClick(notif.id, notif.link)}
-                    className={`w-full text-left p-3 border-b border-dark-border/50 hover:bg-slate-800/50 transition-colors flex items-start gap-3
-                      ${notif.isRead ? 'opacity-70' : 'bg-slate-800/20'}`}
+                    className={`w-full text-left p-3 border-b border-dark-border hover:bg-accent transition-colors flex items-start gap-3
+                      ${notif.isRead ? 'opacity-70 bg-card' : 'bg-muted'}`}
                   >
-                    <div className="mt-0.5 w-6 h-6 rounded bg-primary-900/50 text-primary-400 flex items-center justify-center shrink-0">
+                    <div className="mt-0.5 w-6 h-6 rounded bg-primary/20 text-primary flex items-center justify-center shrink-0">
                       <Info size={14} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm truncate ${notif.isRead ? 'text-slate-300' : 'text-slate-100 font-medium'}`}>
+                      <p className={`text-sm truncate ${notif.isRead ? 'text-foreground' : 'text-foreground font-medium'}`}>
                         {notif.title}
                       </p>
-                      <p className="text-xs text-slate-400 mt-1 line-clamp-2">
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                         {notif.message}
                       </p>
-                      <span className="text-[10px] text-slate-500 mt-1.5 block">
+                      <span className="text-[10px] text-muted-foreground mt-1.5 block">
                         {new Date(notif.createdAt).toLocaleString('id-ID')}
                       </span>
                     </div>
                     {!notif.isRead && (
-                      <div className="w-2 h-2 rounded-full bg-primary-500 shrink-0 mt-1.5" />
+                      <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />
                     )}
                   </button>
                 ))}
