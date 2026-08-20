@@ -99,6 +99,23 @@ export const createPublicTicket = async (req: Request, res: Response): Promise<v
       },
     });
 
+    // Notify all IT_SUPPORT and ADMIN users
+    const supportUsers = await prisma.user.findMany({
+      where: { role: { in: ['ADMIN', 'IT_SUPPORT'] } },
+      select: { id: true }
+    });
+
+    if (supportUsers.length > 0) {
+      await prisma.notification.createMany({
+        data: supportUsers.map(u => ({
+          userId: u.id,
+          title: `Tiket Baru: ${ticket.ticketId}`,
+          message: `${employee.name} dari ${department.name} melaporkan: ${ticket.issue}`,
+          link: '/tiket'
+        }))
+      });
+    }
+
     res.status(201).json({
       success: true,
       message: 'Tiket berhasil dibuat. Catat nomor tiket Anda.',

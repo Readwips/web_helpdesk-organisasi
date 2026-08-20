@@ -20,6 +20,7 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
   activityLogs ActivityLog[]
+  notifications Notification[]
   technician   Technician? @relation(fields: [technicianId], references: [id])
 
   @@map("users")
@@ -143,4 +144,18 @@ model Employee {
   createdAt    DateTime @default(now()) @map("created_at")
 
   @@map("employees")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  title     String   @db.VarChar(100)
+  message   String   @db.VarChar(255)
+  isRead    Boolean  @default(false) @map("is_read")
+  link      String?  @db.VarChar(100)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
 }

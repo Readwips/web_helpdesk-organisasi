@@ -1,6 +1,7 @@
 import { Bell, Search, Sun, Moon, Menu } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../store/authStore';
+import NotificationDropdown from './NotificationDropdown';
 
 interface NavbarProps {
   title: string;
@@ -77,15 +78,8 @@ export default function Navbar({ title, subtitle, onMenuToggle }: NavbarProps) {
           <span>Pencarian</span>
         </button>
 
-        {/* Notification */}
-        <button
-          className="relative p-2 rounded-lg transition-colors"
-          style={{ color: 'var(--muted-foreground)' }}
-          title="Notifikasi"
-        >
-          <Bell size={18} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
-        </button>
+        {/* Notification Dropdown */}
+        <NotificationDropdown />
 
         {/* Theme Toggle */}
         <button

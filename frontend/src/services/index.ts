@@ -159,3 +159,14 @@ export const employeeService = {
   import: (rows: any[]) =>
     api.post('/employees/import', { rows }),
 };
+
+export const notificationService = {
+  getAll: () =>
+    api.get('/notifications'),
+
+  markAsRead: (id: number) =>
+    api.put(`/notifications/${id}/read`),
+
+  markAllAsRead: () =>
+    api.put('/notifications/read-all'),
+};

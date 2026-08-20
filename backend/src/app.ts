@@ -11,6 +11,7 @@ import { userRoutes } from './routes/user.routes';
 import { masterRoutes } from './routes/master.routes';
 import { publicRoutes } from './routes/public.routes';
 import { employeeRoutes } from './routes/employee.routes';
+import { notificationRoutes } from './routes/notification.routes';
 import { errorHandler } from './middleware/errorHandler';
 
 dotenv.config();
@@ -36,6 +37,7 @@ app.use('/api/report', reportRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/public', publicRoutes);
+app.use('/api/notifications', notificationRoutes);
 // Health check (public — must be before masterRoutes)
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', message: 'IT Helpdesk API is running', timestamp: new Date() });
