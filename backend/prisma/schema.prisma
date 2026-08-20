@@ -132,3 +132,15 @@ model ActivityLog {
 
   @@map("activity_logs")
 }
+
+model Employee {
+  id           Int      @id @default(autoincrement())
+  employeeCode String   @unique @db.VarChar(20) @map("employee_code")
+  name         String   @db.VarChar(100)
+  department   String   @db.VarChar(100)
+  position     String?  @db.VarChar(100)
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("employees")
+}

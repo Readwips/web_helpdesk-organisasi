@@ -123,3 +123,39 @@ export const userService = {
   update: (id: number, data: any) =>
     api.put(`/users/${id}`, data),
 };
+
+// Public services — no auth needed
+import axios from 'axios';
+const publicApi = axios.create({ baseURL: 'http://localhost:5000/api/public' });
+
+export const publicService = {
+  verifyEmployee: (employeeCode: string) =>
+    publicApi.post('/verify-employee', { employeeCode }),
+
+  createTicket: (data: {
+    employeeCode: string;
+    categoryId: number;
+    subcategoryId?: number;
+    issue: string;
+    description?: string;
+    priority: string;
+    location?: string;
+  }) => publicApi.post('/tickets', data),
+
+  getCategories: () =>
+    publicApi.get('/categories'),
+};
+
+export const employeeService = {
+  getAll: (params?: { search?: string; isActive?: boolean }) =>
+    api.get('/employees', { params }),
+
+  create: (data: { employeeCode: string; name: string; department: string; position?: string }) =>
+    api.post('/employees', data),
+
+  update: (id: number, data: any) =>
+    api.put(`/employees/${id}`, data),
+
+  import: (rows: any[]) =>
+    api.post('/employees/import', { rows }),
+};

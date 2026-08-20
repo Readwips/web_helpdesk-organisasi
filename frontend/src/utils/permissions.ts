@@ -15,6 +15,7 @@ export const PERMISSIONS = {
   PAGE_LAPORAN:      ['ADMIN', 'MANAGER'] as UserRole[],
   PAGE_PENGATURAN:   ['ADMIN', 'IT_SUPPORT', 'MANAGER'] as UserRole[],
   PAGE_MANAJEMEN_AKUN: ['ADMIN', 'MANAGER'] as UserRole[],
+  PAGE_MANAJEMEN_PEGAWAI: ['ADMIN'] as UserRole[],
 
   // Actions within pages
   ACTION_CREATE_TICKET: ['ADMIN', 'IT_SUPPORT'] as UserRole[],

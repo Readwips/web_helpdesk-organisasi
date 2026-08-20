@@ -13,6 +13,8 @@ import LaporanPage from './pages/LaporanPage';
 import PlaceholderPage from './components/ui/PlaceholderPage';
 import PengaturanPage from './pages/PengaturanPage';
 import ManajemenAkunPage from './pages/ManajemenAkunPage';
+import ManajemenPegawaiPage from './pages/ManajemenPegawaiPage';
+import PortalPage from './pages/PortalPage';
 import { PERMISSIONS, hasPermission } from './utils/permissions';
 
 
@@ -60,6 +62,9 @@ export default function App() {
           <PublicRoute><LoginPage /></PublicRoute>
         } />
 
+        {/* Public portal — no login needed */}
+        <Route path="/portal" element={<PortalPage />} />
+
         {/* Private routes */}
         <Route element={
           <PrivateRoute><Layout /></PrivateRoute>
@@ -103,6 +108,12 @@ export default function App() {
           <Route path="/manajemen-akun" element={
             <RoleRoute roles={PERMISSIONS.PAGE_MANAJEMEN_AKUN as unknown as string[]}>
               <ManajemenAkunPage />
+            </RoleRoute>
+          } />
+
+          <Route path="/manajemen-pegawai" element={
+            <RoleRoute roles={['ADMIN']}>
+              <ManajemenPegawaiPage />
             </RoleRoute>
           } />
         </Route>

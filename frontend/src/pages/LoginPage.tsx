@@ -182,7 +182,21 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="mt-8 text-center text-xs text-slate-600">
+          {/* Portal link for employees */}
+          <div className="mt-6 pt-5 border-t" style={{ borderColor: 'var(--border)' }}>
+            <p className="text-center text-xs mb-3" style={{ color: 'var(--muted-foreground)' }}>
+              Bukan staff IT? Buat tiket keluhan Anda di sini:
+            </p>
+            <a
+              href="/portal"
+              className="btn-secondary w-full justify-center py-2.5 text-sm block text-center"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+            >
+              🎫 Portal Tiket untuk Pegawai
+            </a>
+          </div>
+
+          <p className="mt-4 text-center text-xs text-slate-600">
             Default password: <code className="text-slate-400 bg-dark-surface px-1 py-0.5 rounded">password123</code>
           </p>
         </div>

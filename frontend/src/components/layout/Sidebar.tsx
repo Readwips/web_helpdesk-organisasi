@@ -19,6 +19,7 @@ const navItems = [
   { to: '/laporan', label: 'Laporan', icon: FileText, roles: PERMISSIONS.PAGE_LAPORAN },
   { to: '/pengaturan', label: 'Pengaturan', icon: Settings, roles: PERMISSIONS.PAGE_PENGATURAN },
   { to: '/manajemen-akun', label: 'Manajemen Akun', icon: Users, roles: PERMISSIONS.PAGE_MANAJEMEN_AKUN },
+  { to: '/manajemen-pegawai', label: 'Data Pegawai', icon: Users, roles: PERMISSIONS.PAGE_MANAJEMEN_PEGAWAI },
 ];
 
 const roleLabel: Record<string, string> = {
