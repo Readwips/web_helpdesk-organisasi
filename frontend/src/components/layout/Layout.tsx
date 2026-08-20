@@ -2,6 +2,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
+import GlobalSearchModal from '../ui/GlobalSearchModal';
 
 const pageTitles: Record<string, { title: string; subtitle: string }> = {
   '/': { title: 'Dashboard', subtitle: 'Monitoring, Analysis & SLA Management' },
@@ -12,6 +13,8 @@ const pageTitles: Record<string, { title: string; subtitle: string }> = {
   '/import': { title: 'Import Data', subtitle: 'Upload dan validasi data CSV/Excel' },
   '/laporan': { title: 'Laporan', subtitle: 'Ringkasan dan ekspor laporan' },
   '/pengaturan': { title: 'Pengaturan', subtitle: 'Manajemen akun dan profil' },
+  '/manajemen-akun': { title: 'Manajemen Akun', subtitle: 'Kelola akses pengguna' },
+  '/manajemen-pegawai': { title: 'Data Pegawai', subtitle: 'Direktori pegawai dan kontak' },
 };
 
 export default function Layout() {
@@ -38,6 +41,7 @@ export default function Layout() {
           </div>
         </main>
       </div>
+      <GlobalSearchModal />
     </div>
   );
 }
