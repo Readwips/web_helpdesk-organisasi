@@ -242,6 +242,11 @@ export default function DataTiketPage() {
                     <td>
                       <div className="text-sm text-slate-300">{ticket.requesterName}</div>
                       <div className="text-[10px] text-slate-500">{ticket.department?.name}</div>
+                      {ticket.location && (
+                        <div className="text-[10px] text-slate-600 flex items-center gap-0.5 mt-0.5">
+                          📍 {ticket.location}
+                        </div>
+                      )}
                     </td>
                     <td><span className={statusClass[ticket.status]}>{ticket.status}</span></td>
                     <td><span className={priorityClass[ticket.priority]}>{ticket.priority}</span></td>

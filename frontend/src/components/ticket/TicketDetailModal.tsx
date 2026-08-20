@@ -57,6 +57,10 @@ export default function TicketDetailModal({ isOpen, onClose, ticket }: TicketDet
               <span className="text-slate-200">{ticket.department?.name}</span>
             </div>
             <div className="flex justify-between items-center text-sm">
+              <span className="text-slate-500">Lokasi / Ruangan</span>
+              <span className="text-slate-200">{ticket.location || <span className="text-slate-600 italic">Tidak dicantumkan</span>}</span>
+            </div>
+            <div className="flex justify-between items-center text-sm">
               <span className="text-slate-500">Tanggal Dibuat</span>
               <span className="text-slate-200">{format(new Date(ticket.createdAt), 'dd MMM yyyy, HH:mm', { locale: localeId })}</span>
             </div>

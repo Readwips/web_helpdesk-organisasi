@@ -205,6 +205,12 @@ export default function KelolaTiketPage() {
                   <span style={{ color: 'var(--muted-foreground)' }}>Requester</span>
                   <span style={{ color: 'var(--foreground)' }}>{ticket.requesterName}</span>
                 </div>
+                {ticket.location && (
+                  <div className="flex justify-between items-center text-xs">
+                    <span style={{ color: 'var(--muted-foreground)' }}>Lokasi</span>
+                    <span style={{ color: 'var(--foreground)' }}>📍 {ticket.location}</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center text-xs">
                   <span style={{ color: 'var(--muted-foreground)' }}>Prioritas</span>
                   <span className={priorityClass[ticket.priority]}>{ticket.priority}</span>
