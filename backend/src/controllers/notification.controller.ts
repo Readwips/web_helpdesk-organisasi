@@ -38,7 +38,7 @@ export const getNotifications = async (req: AuthRequest, res: Response): Promise
 export const markAsRead = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user?.id;
-    const notificationId = parseInt(req.params.id);
+    const notificationId = parseInt(String(req.params.id));
 
     if (!userId || isNaN(notificationId)) {
       res.status(400).json({ success: false, message: 'Invalid data' });

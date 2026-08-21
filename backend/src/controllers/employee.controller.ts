@@ -64,7 +64,7 @@ export const updateEmployee = async (req: Request & { user?: { id: number } }, r
     const { name, department, position, isActive } = req.body;
 
     const employee = await prisma.employee.update({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(String(id)) },
       data: {
         ...(name && { name }),
         ...(department && { department }),

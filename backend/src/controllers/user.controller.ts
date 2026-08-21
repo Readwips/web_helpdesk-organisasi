@@ -50,7 +50,7 @@ export const getUserActivity = async (req: Request, res: Response): Promise<void
 
     const where: any = {};
     if (id !== 'all') {
-      where.userId = parseInt(id);
+      where.userId = parseInt(String(id));
     }
     if (action) {
       where.action = action;
@@ -130,14 +130,14 @@ export const updateUser = async (req: Request & { user?: { id: number } }, res: 
     const { id } = req.params;
     const { name, email, password, technicianName } = req.body;
 
-    const existingUser = await prisma.user.findUnique({ where: { id: parseInt(id) } });
+    const existingUser = await prisma.user.findUnique({ where: { id: parseInt(String(id)) } });
     if (!existingUser) {
       res.status(404).json({ success: false, message: 'Akun tidak ditemukan.' });
       return;
     }
 
     if (email && email !== existingUser.email) {
-      const emailTaken = await prisma.user.findFirst({ where: { email, NOT: { id: parseInt(id) } } });
+      const emailTaken = await prisma.user.findFirst({ where: { email, NOT: { id: parseInt(String(id)) } } });
       if (emailTaken) {
         res.status(409).json({ success: false, message: 'Email sudah digunakan oleh akun lain.' });
         return;
@@ -154,7 +154,7 @@ export const updateUser = async (req: Request & { user?: { id: number } }, res: 
     // If technicianName is provided, update the linked Technician record
     if (technicianName) {
       const linkedTech = await prisma.technician.findFirst({
-        where: { user: { id: parseInt(id) } },
+        where: { user: { id: parseInt(String(id)) } },
       });
       if (linkedTech) {
         await prisma.technician.update({
@@ -166,7 +166,7 @@ export const updateUser = async (req: Request & { user?: { id: number } }, res: 
             req.user.id,
             'UPDATE_USER',
             `Mengubah nama teknisi akun ${existingUser.name} menjadi "${technicianName}"`,
-            { targetUserId: parseInt(id), technicianName },
+            { targetUserId: parseInt(String(id)), technicianName },
             req.ip
           );
         }
@@ -179,7 +179,7 @@ export const updateUser = async (req: Request & { user?: { id: number } }, res: 
     }
 
     const updatedUser = await prisma.user.update({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(String(id)) },
       data: updateData,
       select: { id: true, name: true, email: true, role: true, createdAt: true },
     });
