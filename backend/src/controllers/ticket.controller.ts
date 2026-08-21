@@ -354,15 +354,19 @@ export const exportTickets = async (req: Request<object, object, object, TicketQ
 
     sheet.columns = [
       { header: 'ID Tiket', key: 'ticketId', width: 15 },
-      { header: 'Tanggal Dibuat', key: 'createdAt', width: 20 },
+      { header: 'Tanggal Dibuat', key: 'createdAt', width: 22 },
       { header: 'Requester', key: 'requesterName', width: 20 },
       { header: 'Departemen', key: 'department', width: 15 },
+      { header: 'Lokasi', key: 'location', width: 20 },
       { header: 'Kategori', key: 'category', width: 15 },
+      { header: 'Subkategori', key: 'subcategory', width: 15 },
       { header: 'Keluhan', key: 'issue', width: 35 },
       { header: 'Prioritas', key: 'priority', width: 12 },
       { header: 'Status', key: 'status', width: 15 },
       { header: 'Teknisi', key: 'technician', width: 20 },
-      { header: 'Tanggal Selesai', key: 'resolvedAt', width: 20 },
+      { header: 'Resolution Time (jam)', key: 'resolutionTime', width: 22 },
+      { header: 'SLA Target (jam)', key: 'slaTarget', width: 18 },
+      { header: 'Tanggal Selesai', key: 'resolvedAt', width: 22 },
       { header: 'Status SLA', key: 'slaStatus', width: 15 },
     ];
 
@@ -376,18 +380,26 @@ export const exportTickets = async (req: Request<object, object, object, TicketQ
       };
     });
 
+    const formatDate = (date: Date) => {
+      return date.toISOString().replace('T', ' ').slice(0, 19); // YYYY-MM-DD HH:mm:ss
+    };
+
     tickets.forEach((t) => {
       const row = sheet.addRow({
         ticketId: t.ticketId,
-        createdAt: t.createdAt.toISOString().slice(0, 10),
+        createdAt: formatDate(t.createdAt),
         requesterName: t.requesterName,
         department: (t as any).department?.name || '-',
+        location: t.location || '-',
         category: (t as any).category?.name || '-',
+        subcategory: (t as any).subcategory?.name || '-',
         issue: t.issue,
         priority: t.priority,
         status: t.status,
         technician: (t as any).technician?.name || '-',
-        resolvedAt: t.resolvedAt ? t.resolvedAt.toISOString().slice(0, 10) : '-',
+        resolutionTime: t.resolutionTime || '',
+        slaTarget: t.slaTarget,
+        resolvedAt: t.resolvedAt ? formatDate(t.resolvedAt) : '',
         slaStatus: t.slaStatus,
       });
 

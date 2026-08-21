@@ -80,10 +80,12 @@ export const exportExcel = async (req: Request, res: Response): Promise<void> =>
 
     sheet.columns = [
       { header: 'Ticket ID', key: 'ticketId', width: 18 },
-      { header: 'Tanggal Dibuat', key: 'createdAt', width: 20 },
+      { header: 'Tanggal Dibuat', key: 'createdAt', width: 22 },
       { header: 'Requester', key: 'requester', width: 20 },
       { header: 'Department', key: 'department', width: 15 },
+      { header: 'Lokasi', key: 'location', width: 20 },
       { header: 'Kategori', key: 'category', width: 15 },
+      { header: 'Subkategori', key: 'subcategory', width: 15 },
       { header: 'Issue', key: 'issue', width: 30 },
       { header: 'Priority', key: 'priority', width: 12 },
       { header: 'Status', key: 'status', width: 14 },
@@ -91,7 +93,7 @@ export const exportExcel = async (req: Request, res: Response): Promise<void> =>
       { header: 'Resolution Time (jam)', key: 'resolutionTime', width: 22 },
       { header: 'SLA Target (jam)', key: 'slaTarget', width: 18 },
       { header: 'SLA Status', key: 'slaStatus', width: 14 },
-      { header: 'Tanggal Resolved', key: 'resolvedAt', width: 20 },
+      { header: 'Tanggal Resolved', key: 'resolvedAt', width: 22 },
     ];
 
     sheet.getRow(1).eachCell((cell) => {
@@ -99,28 +101,29 @@ export const exportExcel = async (req: Request, res: Response): Promise<void> =>
     });
     sheet.getRow(1).height = 30;
 
+    const formatDate = (date: Date) => {
+      return date.toISOString().replace('T', ' ').slice(0, 19); // YYYY-MM-DD HH:mm:ss
+    };
+
     tickets.forEach((ticket) => {
       sheet.addRow({
         ticketId: ticket.ticketId,
-        createdAt: ticket.createdAt.toLocaleDateString('id-ID'),
+        createdAt: formatDate(ticket.createdAt),
         requester: ticket.requesterName,
         department: ticket.department?.name || '-',
+        location: ticket.location || '-',
         category: ticket.category?.name || '-',
+        subcategory: ticket.subcategory?.name || '-',
         issue: ticket.issue,
         priority: ticket.priority,
         status: ticket.status.replace('_', ' '),
         technician: ticket.technician?.name || '-',
-        resolutionTime: ticket.resolutionTime || '-',
+        resolutionTime: ticket.resolutionTime || '',
         slaTarget: ticket.slaTarget,
         slaStatus: ticket.slaStatus,
-        resolvedAt: ticket.resolvedAt ? ticket.resolvedAt.toLocaleDateString('id-ID') : '-',
+        resolvedAt: ticket.resolvedAt ? formatDate(ticket.resolvedAt) : '',
       });
     });
-
-    // Add summary row
-    sheet.addRow([]);
-    const summaryRow = sheet.addRow(['Total Tiket:', tickets.length]);
-    summaryRow.font = { bold: true };
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', `attachment; filename=laporan-tiket-${Date.now()}.xlsx`);
