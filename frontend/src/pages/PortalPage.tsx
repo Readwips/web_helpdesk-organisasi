@@ -103,7 +103,7 @@ export default function PortalPage() {
       <header className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--border)', background: 'var(--card)' }}>
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: 'var(--primary)' }}>
-            <Ticket size={18} className="text-white" />
+            <Ticket size={18} className="text-foreground" />
           </div>
           <div>
             <h1 className="font-bold text-sm" style={{ color: 'var(--foreground)' }}>Portal Helpdesk IT</h1>
@@ -191,7 +191,7 @@ export default function PortalPage() {
             <div className="animate-fade-in space-y-4">
               {/* Employee Info Card */}
               <div className="card p-4 flex items-center gap-3" style={{ borderColor: 'var(--primary)', borderWidth: 1 }}>
-                <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0" style={{ background: 'var(--primary)' }}>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center text-foreground font-bold text-sm shrink-0" style={{ background: 'var(--primary)' }}>
                   {employee.name.charAt(0)}
                 </div>
                 <div className="flex-1">

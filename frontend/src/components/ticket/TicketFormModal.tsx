@@ -108,7 +108,7 @@ export default function TicketFormModal({
         {!isEdit && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Nama Pemohon (Requester)</label>
+              <label className="block text-sm font-medium text-foreground mb-1.5">Nama Pemohon (Requester)</label>
               <input
                 required
                 type="text"
@@ -118,7 +118,7 @@ export default function TicketFormModal({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Departemen</label>
+              <label className="block text-sm font-medium text-foreground mb-1.5">Departemen</label>
               <select
                 required
                 className="select"
@@ -133,7 +133,7 @@ export default function TicketFormModal({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1.5">Kategori</label>
+            <label className="block text-sm font-medium text-foreground mb-1.5">Kategori</label>
             <select
               required
               className="select"
@@ -144,7 +144,7 @@ export default function TicketFormModal({
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1.5">Subkategori</label>
+            <label className="block text-sm font-medium text-foreground mb-1.5">Subkategori</label>
             <select
               className="select"
               value={formData.subcategoryId || ''}
@@ -157,7 +157,7 @@ export default function TicketFormModal({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">Keluhan Utama</label>
+          <label className="block text-sm font-medium text-foreground mb-1.5">Keluhan Utama</label>
           <input
             required
             type="text"
@@ -168,7 +168,7 @@ export default function TicketFormModal({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">Deskripsi Detail</label>
+          <label className="block text-sm font-medium text-foreground mb-1.5">Deskripsi Detail</label>
           <textarea
             className="input min-h-[100px]"
             value={formData.description || ''}
@@ -178,7 +178,7 @@ export default function TicketFormModal({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1.5">Prioritas</label>
+            <label className="block text-sm font-medium text-foreground mb-1.5">Prioritas</label>
             <select
               required
               className="select"
@@ -195,7 +195,7 @@ export default function TicketFormModal({
           {/* Only show technician assign for Admin/Manager — IT_SUPPORT is auto-assigned */}
           {!isITSupport ? (
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Assign ke Teknisi</label>
+              <label className="block text-sm font-medium text-foreground mb-1.5">Assign ke Teknisi</label>
               <select
                 className="select"
                 value={formData.technicianId || ''}
@@ -207,7 +207,7 @@ export default function TicketFormModal({
             </div>
           ) : (
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Assign ke Teknisi</label>
+              <label className="block text-sm font-medium text-foreground mb-1.5">Assign ke Teknisi</label>
               <div className="flex items-center gap-2 h-[42px] px-3 rounded-lg" style={{ background: 'var(--muted)', border: '1px solid var(--border)' }}>
                 <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>👤</span>
                 <span className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>
@@ -220,7 +220,7 @@ export default function TicketFormModal({
 
         {isEdit && (
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1.5">Status Tiket</label>
+            <label className="block text-sm font-medium text-foreground mb-1.5">Status Tiket</label>
             <select
               required
               className="select"

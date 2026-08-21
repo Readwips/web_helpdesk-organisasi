@@ -114,13 +114,13 @@ export default function DataTiketPage() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Data Tiket</h1>
-          <p className="text-sm text-slate-400 mt-1">Seluruh riwayat tiket IT Support</p>
+          <h1 className="text-2xl font-bold text-foreground">Data Tiket</h1>
+          <p className="text-sm text-muted-foreground mt-1">Seluruh riwayat tiket IT Support</p>
         </div>
         <div className="flex items-center gap-2">
           <button 
             onClick={() => setShowFilters(!showFilters)}
-            className={`btn-secondary ${showFilters ? 'bg-primary-600/20 text-primary-400 border-primary-600/30' : ''}`}
+            className={`btn-secondary ${showFilters ? 'bg-primary-600/20 text-primary border-primary-600/30' : ''}`}
           >
             <Filter size={16} /> Filter
           </button>
@@ -139,9 +139,9 @@ export default function DataTiketPage() {
       {showFilters && (
         <div className="card p-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 animate-slide-in">
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Pencarian</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Pencarian</label>
             <div className="relative">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="ID Tiket, Issue, Requester..."
@@ -152,7 +152,7 @@ export default function DataTiketPage() {
             </div>
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Status</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Status</label>
             <select
               className="select text-sm"
               value={filters.status || ''}
@@ -167,7 +167,7 @@ export default function DataTiketPage() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Prioritas</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Prioritas</label>
             <select
               className="select text-sm"
               value={filters.priority || ''}
@@ -181,7 +181,7 @@ export default function DataTiketPage() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Kategori</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Kategori</label>
             <select
               className="select text-sm"
               value={filters.category || ''}
@@ -221,29 +221,29 @@ export default function DataTiketPage() {
                 ))
               ) : tickets.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-8 text-slate-500">
+                  <td colSpan={8} className="text-center py-8 text-muted-foreground">
                     Tidak ada data tiket ditemukan.
                   </td>
                 </tr>
               ) : (
                 tickets.map((ticket: Ticket) => (
                   <tr key={ticket.id}>
-                    <td className="font-mono text-xs text-primary-400">{ticket.ticketId}</td>
+                    <td className="font-mono text-xs text-primary">{ticket.ticketId}</td>
                     <td className="text-xs">
                       <div className="flex items-center gap-1.5">
-                        <Calendar size={12} className="text-slate-500" />
+                        <Calendar size={12} className="text-muted-foreground" />
                         {format(new Date(ticket.createdAt), 'dd MMM yyyy', { locale: localeId })}
                       </div>
                     </td>
                     <td className="max-w-[200px]">
-                      <div className="truncate font-medium text-slate-200" title={ticket.issue}>{ticket.issue}</div>
-                      <div className="text-[10px] text-slate-500 truncate">{ticket.category?.name}</div>
+                      <div className="truncate font-medium text-foreground" title={ticket.issue}>{ticket.issue}</div>
+                      <div className="text-[10px] text-muted-foreground truncate">{ticket.category?.name}</div>
                     </td>
                     <td>
-                      <div className="text-sm text-slate-300">{ticket.requesterName}</div>
-                      <div className="text-[10px] text-slate-500">{ticket.department?.name}</div>
+                      <div className="text-sm text-foreground">{ticket.requesterName}</div>
+                      <div className="text-[10px] text-muted-foreground">{ticket.department?.name}</div>
                       {ticket.location && (
-                        <div className="text-[10px] text-slate-600 flex items-center gap-0.5 mt-0.5">
+                        <div className="text-[10px] text-muted-foreground flex items-center gap-0.5 mt-0.5">
                           📍 {ticket.location}
                         </div>
                       )}
@@ -254,7 +254,7 @@ export default function DataTiketPage() {
                     <td>
                       <div className="flex items-center justify-end gap-2">
                         <button 
-                          className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors" 
+                          className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded transition-colors" 
                           title="Lihat Detail"
                           onClick={() => {
                             setSelectedTicket(ticket);
@@ -274,8 +274,8 @@ export default function DataTiketPage() {
         
         {/* Pagination */}
         <div className="px-6 py-4 border-t border-dark-border flex items-center justify-between">
-          <div className="text-sm text-slate-400">
-            Menampilkan <span className="text-white font-medium">{(pagination.page - 1) * pagination.limit + (tickets.length > 0 ? 1 : 0)}</span> - <span className="text-white font-medium">{(pagination.page - 1) * pagination.limit + tickets.length}</span> dari <span className="text-white font-medium">{pagination.total}</span> data
+          <div className="text-sm text-muted-foreground">
+            Menampilkan <span className="text-foreground font-medium">{(pagination.page - 1) * pagination.limit + (tickets.length > 0 ? 1 : 0)}</span> - <span className="text-foreground font-medium">{(pagination.page - 1) * pagination.limit + tickets.length}</span> dari <span className="text-foreground font-medium">{pagination.total}</span> data
           </div>
           <div className="flex items-center gap-2">
             <button 
@@ -285,7 +285,7 @@ export default function DataTiketPage() {
             >
               <ChevronLeft size={16} />
             </button>
-            <span className="text-sm font-medium text-slate-300 px-2">
+            <span className="text-sm font-medium text-foreground px-2">
               Halaman {pagination.page} dari {pagination.totalPages}
             </span>
             <button 

@@ -30,7 +30,7 @@ const CustomBarTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-dark-card border border-dark-border rounded-lg px-4 py-3 shadow-xl text-sm">
-        <p className="font-semibold text-white mb-2">{label}</p>
+        <p className="font-semibold text-foreground mb-2">{label}</p>
         {payload.map((p: any) => (
           <p key={p.name} style={{ color: p.fill || p.color }}>
             {p.name}: <span className="font-bold">{p.value}</span>
@@ -59,11 +59,11 @@ function StatCard({
         <Icon size={22} />
       </div>
       <div>
-        <p className="text-xs text-slate-400 mb-0.5">{title}</p>
-        <p className="text-2xl font-bold text-white">
-          {value}<span className="text-lg text-slate-400">{valueSuffix}</span>
+        <p className="text-xs text-muted-foreground mb-0.5">{title}</p>
+        <p className="text-2xl font-bold text-foreground">
+          {value}<span className="text-lg text-muted-foreground">{valueSuffix}</span>
         </p>
-        {sub && <p className="text-xs text-slate-500 mt-0.5">{sub}</p>}
+        {sub && <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>}
       </div>
     </div>
   );
@@ -119,8 +119,8 @@ export default function SlaPage() {
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Kepatuhan SLA</h1>
-        <p className="text-sm text-slate-400 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Kepatuhan SLA</h1>
+        <p className="text-sm text-muted-foreground mt-1">
           Monitoring Service Level Agreement — standar penyelesaian tiket
         </p>
       </div>
@@ -144,7 +144,7 @@ export default function SlaPage() {
             value={summary.slaMet}
             sub={`${summary.slaCompliance}% compliance rate`}
             icon={ShieldCheck}
-            iconColor="bg-primary-500/15 text-primary-400"
+            iconColor="bg-primary-500/15 text-primary"
           />
           <StatCard
             title="SLA Dilanggar"
@@ -169,7 +169,7 @@ export default function SlaPage() {
 
         {/* Gauge / Compliance Meter */}
         <div className="card p-6 flex flex-col items-center justify-center">
-          <h2 className="text-base font-semibold text-white mb-4 self-start">Overall Compliance</h2>
+          <h2 className="text-base font-semibold text-foreground mb-4 self-start">Overall Compliance</h2>
           {isLoading ? (
             <div className="h-48 w-full skeleton rounded-xl" />
           ) : (
@@ -189,21 +189,21 @@ export default function SlaPage() {
                   <span className="text-4xl font-bold" style={{ color: complianceColor }}>
                     {summary?.slaCompliance ?? 0}
                   </span>
-                  <span className="text-slate-400 text-sm mt-1">%</span>
+                  <span className="text-muted-foreground text-sm mt-1">%</span>
                 </div>
               </div>
               <div className="mt-4 flex gap-4 text-sm">
                 <div className="flex items-center gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                  <span className="text-slate-400">≥90% Baik</span>
+                  <span className="text-muted-foreground">≥90% Baik</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                  <span className="text-slate-400">70-89% Sedang</span>
+                  <span className="text-muted-foreground">70-89% Sedang</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-red-500" />
-                  <span className="text-slate-400">&lt;70% Buruk</span>
+                  <span className="text-muted-foreground">&lt;70% Buruk</span>
                 </div>
               </div>
             </>
@@ -212,7 +212,7 @@ export default function SlaPage() {
 
         {/* SLA by Priority Bar Chart */}
         <div className="card p-6 xl:col-span-2">
-          <h2 className="text-base font-semibold text-white mb-4">SLA per Prioritas</h2>
+          <h2 className="text-base font-semibold text-foreground mb-4">SLA per Prioritas</h2>
           {isLoading ? (
             <div className="h-52 skeleton rounded-xl" />
           ) : (
@@ -240,7 +240,7 @@ export default function SlaPage() {
 
         {/* By Category */}
         <div className="card p-6">
-          <h2 className="text-base font-semibold text-white mb-4">Compliance per Kategori</h2>
+          <h2 className="text-base font-semibold text-foreground mb-4">Compliance per Kategori</h2>
           {isLoading ? (
             <div className="h-64 skeleton rounded-xl" />
           ) : (
@@ -250,7 +250,7 @@ export default function SlaPage() {
                 .map((cat) => (
                   <div key={cat.category}>
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm text-slate-300">{cat.category}</span>
+                      <span className="text-sm text-foreground">{cat.category}</span>
                       <div className="flex items-center gap-3 text-xs">
                         <span className="text-emerald-400">{cat.met} Met</span>
                         <span className="text-red-400">{cat.breached} Breached</span>
@@ -279,7 +279,7 @@ export default function SlaPage() {
 
         {/* By Technician */}
         <div className="card p-6">
-          <h2 className="text-base font-semibold text-white mb-4">Performa Teknisi (SLA)</h2>
+          <h2 className="text-base font-semibold text-foreground mb-4">Performa Teknisi (SLA)</h2>
           {isLoading ? (
             <div className="h-64 skeleton rounded-xl" />
           ) : (
@@ -288,10 +288,10 @@ export default function SlaPage() {
                 .sort((a, b) => b.compliance - a.compliance)
                 .map((tech, idx) => (
                   <div key={tech.technician} className="flex items-center gap-3">
-                    <span className="text-xs text-slate-500 w-5 flex-shrink-0">#{idx + 1}</span>
+                    <span className="text-xs text-muted-foreground w-5 flex-shrink-0">#{idx + 1}</span>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between mb-1">
-                        <span className="text-sm text-slate-300 truncate">{tech.technician}</span>
+                        <span className="text-sm text-foreground truncate">{tech.technician}</span>
                         <span
                           className="text-sm font-bold flex-shrink-0 ml-2"
                           style={{ color: COMPLIANCE_COLOR(tech.compliance) }}
@@ -309,7 +309,7 @@ export default function SlaPage() {
                         />
                       </div>
                     </div>
-                    <div className="text-[10px] text-slate-500 flex-shrink-0 text-right">
+                    <div className="text-[10px] text-muted-foreground flex-shrink-0 text-right">
                       <div className="text-emerald-400">{tech.met}✓</div>
                       <div className="text-red-400">{tech.breached}✗</div>
                     </div>
@@ -324,8 +324,8 @@ export default function SlaPage() {
       <div className="card">
         <div className="p-5 border-b border-dark-border flex items-center gap-3">
           <AlertTriangle size={18} className="text-red-400" />
-          <h2 className="text-base font-semibold text-white">Tiket SLA Dilanggar</h2>
-          <span className="ml-auto text-sm text-slate-400">{pagination.total} tiket</span>
+          <h2 className="text-base font-semibold text-foreground">Tiket SLA Dilanggar</h2>
+          <span className="ml-auto text-sm text-muted-foreground">{pagination.total} tiket</span>
         </div>
 
         <div className="table-wrapper">
@@ -354,7 +354,7 @@ export default function SlaPage() {
                 ))
               ) : breached.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="text-center py-8 text-slate-500">
+                  <td colSpan={9} className="text-center py-8 text-muted-foreground">
                     🎉 Tidak ada tiket yang melanggar SLA!
                   </td>
                 </tr>
@@ -367,16 +367,16 @@ export default function SlaPage() {
                     <tr key={ticket.id}>
                       <td className="font-mono text-xs text-red-400">{ticket.ticketId}</td>
                       <td className="max-w-[180px]">
-                        <div className="truncate text-slate-200 text-sm" title={ticket.issue}>{ticket.issue}</div>
+                        <div className="truncate text-foreground text-sm" title={ticket.issue}>{ticket.issue}</div>
                       </td>
                       <td>
                         <span style={{ color: PRIORITY_COLORS[ticket.priority] }} className="text-xs font-semibold">
                           {ticket.priority}
                         </span>
                       </td>
-                      <td className="text-xs text-slate-300">{ticket.category?.name}</td>
-                      <td className="text-xs text-slate-400">{ticket.department?.name}</td>
-                      <td className="text-xs text-slate-300">{ticket.slaTarget} jam</td>
+                      <td className="text-xs text-foreground">{ticket.category?.name}</td>
+                      <td className="text-xs text-muted-foreground">{ticket.department?.name}</td>
+                      <td className="text-xs text-foreground">{ticket.slaTarget} jam</td>
                       <td className="text-xs text-red-300">
                         {ticket.resolutionTime ? `${ticket.resolutionTime} jam` : '-'}
                       </td>
@@ -387,7 +387,7 @@ export default function SlaPage() {
                           </span>
                         ) : '-'}
                       </td>
-                      <td className="text-xs text-slate-400">
+                      <td className="text-xs text-muted-foreground">
                         {format(new Date(ticket.createdAt), 'dd MMM yy', { locale: localeId })}
                       </td>
                     </tr>
@@ -400,9 +400,9 @@ export default function SlaPage() {
 
         {/* Pagination */}
         <div className="px-6 py-4 border-t border-dark-border flex items-center justify-between">
-          <div className="text-sm text-slate-400">
-            Halaman <span className="text-white font-medium">{pagination.page}</span> dari{' '}
-            <span className="text-white font-medium">{pagination.totalPages}</span>
+          <div className="text-sm text-muted-foreground">
+            Halaman <span className="text-foreground font-medium">{pagination.page}</span> dari{' '}
+            <span className="text-foreground font-medium">{pagination.totalPages}</span>
           </div>
           <div className="flex items-center gap-2">
             <button

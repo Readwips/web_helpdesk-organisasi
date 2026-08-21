@@ -116,8 +116,8 @@ export default function ImportPage() {
     <div className="space-y-6 animate-fade-in max-w-5xl">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Import Data</h1>
-          <p className="text-sm text-slate-400 mt-1">Upload file CSV atau Excel untuk import tiket secara massal</p>
+          <h1 className="text-2xl font-bold text-foreground">Import Data</h1>
+          <p className="text-sm text-muted-foreground mt-1">Upload file CSV atau Excel untuk import tiket secara massal</p>
         </div>
         <button onClick={downloadTemplate} className="btn-secondary">
           <Download size={16} /> Download Template Excel
@@ -129,15 +129,15 @@ export default function ImportPage() {
         {(['upload', 'preview', 'done'] as ImportStep[]).map((s, i) => (
           <div key={s} className="flex items-center gap-2">
             <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors
-              ${step === s ? 'bg-primary-600 text-white' : 
-                (step === 'preview' && i === 0) || step === 'done' ? 'bg-emerald-600 text-white' : 
-                'bg-dark-border text-slate-500'}`}
+              ${step === s ? 'bg-primary-600 text-foreground' : 
+                (step === 'preview' && i === 0) || step === 'done' ? 'bg-emerald-600 text-foreground' : 
+                'bg-dark-border text-muted-foreground'}`}
             >
               {((step === 'preview' && i === 0) || step === 'done') && i < ['upload','preview','done'].indexOf(step)
                 ? <CheckCircle2 size={14} />
                 : i + 1}
             </div>
-            <span className={`text-sm font-medium capitalize ${step === s ? 'text-white' : 'text-slate-500'}`}>
+            <span className={`text-sm font-medium capitalize ${step === s ? 'text-foreground' : 'text-muted-foreground'}`}>
               {s === 'upload' ? '1. Upload File' : s === 'preview' ? '2. Preview & Validasi' : '3. Selesai'}
             </span>
             {i < 2 && <div className="w-8 h-px bg-dark-border mx-1" />}
@@ -174,11 +174,11 @@ export default function ImportPage() {
               <div className="flex flex-col items-center gap-3">
                 <FileSpreadsheet size={52} className="text-emerald-400" />
                 <div>
-                  <p className="text-white font-semibold">{file.name}</p>
-                  <p className="text-slate-400 text-sm">{(file.size / 1024).toFixed(1)} KB</p>
+                  <p className="text-foreground font-semibold">{file.name}</p>
+                  <p className="text-muted-foreground text-sm">{(file.size / 1024).toFixed(1)} KB</p>
                 </div>
                 <button
-                  className="p-1 text-slate-400 hover:text-red-400 transition-colors"
+                  className="p-1 text-muted-foreground hover:text-red-400 transition-colors"
                   onClick={(e) => { e.stopPropagation(); setFile(null); }}
                 >
                   <X size={16} /> Hapus file
@@ -186,10 +186,10 @@ export default function ImportPage() {
               </div>
             ) : (
               <div className="flex flex-col items-center gap-3">
-                <UploadCloud size={52} className="text-slate-500" />
+                <UploadCloud size={52} className="text-muted-foreground" />
                 <div>
-                  <p className="text-white font-medium">Drag & drop file di sini, atau klik untuk memilih</p>
-                  <p className="text-slate-400 text-sm mt-1">Mendukung: CSV, Excel (.xlsx, .xls) — Maks. 10 MB</p>
+                  <p className="text-foreground font-medium">Drag & drop file di sini, atau klik untuk memilih</p>
+                  <p className="text-muted-foreground text-sm mt-1">Mendukung: CSV, Excel (.xlsx, .xls) — Maks. 10 MB</p>
                 </div>
               </div>
             )}
@@ -197,18 +197,18 @@ export default function ImportPage() {
 
           {/* Kolom yang dibutuhkan */}
           <div className="mt-6 p-4 bg-dark-bg rounded-lg border border-dark-border">
-            <p className="text-sm font-semibold text-slate-300 mb-2">📋 Kolom yang Diperlukan:</p>
+            <p className="text-sm font-semibold text-foreground mb-2">📋 Kolom yang Diperlukan:</p>
             <div className="flex flex-wrap gap-2">
               {['requester_name*', 'department*', 'category*', 'issue*', 'priority*', 'status', 'technician', 'created_at', 'resolved_at', 'resolution_notes'].map(col => (
                 <span
                   key={col}
-                  className={`px-2 py-0.5 rounded text-xs font-mono ${col.endsWith('*') ? 'bg-red-500/20 text-red-300 border border-red-500/30' : 'bg-dark-surface text-slate-400 border border-dark-border'}`}
+                  className={`px-2 py-0.5 rounded text-xs font-mono ${col.endsWith('*') ? 'bg-red-500/20 text-red-300 border border-red-500/30' : 'bg-dark-surface text-muted-foreground border border-dark-border'}`}
                 >
                   {col}
                 </span>
               ))}
             </div>
-            <p className="text-xs text-slate-500 mt-2">* Kolom wajib diisi. Priority: critical/high/medium/low</p>
+            <p className="text-xs text-muted-foreground mt-2">* Kolom wajib diisi. Priority: critical/high/medium/low</p>
           </div>
 
           <div className="mt-6 flex justify-end">
@@ -232,20 +232,20 @@ export default function ImportPage() {
           {/* Summary cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="card p-4 text-center">
-              <p className="text-2xl font-bold text-white">{validation.totalRows}</p>
-              <p className="text-xs text-slate-400 mt-1">Total Baris</p>
+              <p className="text-2xl font-bold text-foreground">{validation.totalRows}</p>
+              <p className="text-xs text-muted-foreground mt-1">Total Baris</p>
             </div>
             <div className="card p-4 text-center border-emerald-500/30">
               <p className="text-2xl font-bold text-emerald-400">{validation.validCount}</p>
-              <p className="text-xs text-slate-400 mt-1">Valid & Siap Import</p>
+              <p className="text-xs text-muted-foreground mt-1">Valid & Siap Import</p>
             </div>
             <div className="card p-4 text-center border-red-500/30">
               <p className="text-2xl font-bold text-red-400">{validation.invalidCount}</p>
-              <p className="text-xs text-slate-400 mt-1">Tidak Valid</p>
+              <p className="text-xs text-muted-foreground mt-1">Tidak Valid</p>
             </div>
             <div className="card p-4 text-center border-amber-500/30">
               <p className="text-2xl font-bold text-amber-400">{validation.duplicateCount}</p>
-              <p className="text-xs text-slate-400 mt-1">Duplikat (dilewati)</p>
+              <p className="text-xs text-muted-foreground mt-1">Duplikat (dilewati)</p>
             </div>
           </div>
 
@@ -258,7 +258,7 @@ export default function ImportPage() {
               </div>
               <div className="space-y-1 max-h-32 overflow-y-auto custom-scrollbar">
                 {validation.invalidRows.map(({ row, reason }) => (
-                  <p key={row} className="text-xs text-slate-400">
+                  <p key={row} className="text-xs text-muted-foreground">
                     <span className="text-red-400 font-mono">Baris {row}:</span> {reason}
                   </p>
                 ))}
@@ -269,7 +269,7 @@ export default function ImportPage() {
           {/* Preview table */}
           <div className="card">
             <div className="px-5 py-4 border-b border-dark-border">
-              <h3 className="text-sm font-semibold text-white">Preview (10 data pertama dari {validation.validCount} data valid)</h3>
+              <h3 className="text-sm font-semibold text-foreground">Preview (10 data pertama dari {validation.validCount} data valid)</h3>
             </div>
             <div className="table-wrapper">
               <table className="table">
@@ -288,20 +288,20 @@ export default function ImportPage() {
                 <tbody>
                   {validation.preview.map((row, i) => (
                     <tr key={i}>
-                      <td className="text-slate-500">{i + 1}</td>
-                      <td className="text-slate-200">{row.requester_name}</td>
-                      <td className="text-xs text-slate-400">{row.department}</td>
-                      <td className="text-xs text-slate-400">{row.category}</td>
+                      <td className="text-muted-foreground">{i + 1}</td>
+                      <td className="text-foreground">{row.requester_name}</td>
+                      <td className="text-xs text-muted-foreground">{row.department}</td>
+                      <td className="text-xs text-muted-foreground">{row.category}</td>
                       <td className="max-w-[200px]">
-                        <div className="truncate text-slate-200 text-xs" title={row.issue}>{row.issue}</div>
+                        <div className="truncate text-foreground text-xs" title={row.issue}>{row.issue}</div>
                       </td>
                       <td>
                         <span className={PRIORITY_COLOR[row.priority?.toLowerCase() || ''] || 'badge'}>
                           {row.priority}
                         </span>
                       </td>
-                      <td className="text-xs text-slate-400">{row.status || 'OPEN'}</td>
-                      <td className="text-xs text-slate-400">{row.created_at || '-'}</td>
+                      <td className="text-xs text-muted-foreground">{row.status || 'OPEN'}</td>
+                      <td className="text-xs text-muted-foreground">{row.created_at || '-'}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -332,18 +332,18 @@ export default function ImportPage() {
       {step === 'done' && importResult && (
         <div className="card p-12 flex flex-col items-center text-center">
           <CheckCircle2 size={64} className="text-emerald-400 mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">Import Berhasil!</h2>
-          <p className="text-slate-400 mb-8">Data tiket telah berhasil ditambahkan ke sistem</p>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Import Berhasil!</h2>
+          <p className="text-muted-foreground mb-8">Data tiket telah berhasil ditambahkan ke sistem</p>
 
           <div className="flex gap-8 mb-8">
             <div>
               <p className="text-4xl font-bold text-emerald-400">{importResult.imported}</p>
-              <p className="text-sm text-slate-400 mt-1">Tiket Berhasil Diimport</p>
+              <p className="text-sm text-muted-foreground mt-1">Tiket Berhasil Diimport</p>
             </div>
             {importResult.failed > 0 && (
               <div>
                 <p className="text-4xl font-bold text-red-400">{importResult.failed}</p>
-                <p className="text-sm text-slate-400 mt-1">Tiket Gagal</p>
+                <p className="text-sm text-muted-foreground mt-1">Tiket Gagal</p>
               </div>
             )}
           </div>

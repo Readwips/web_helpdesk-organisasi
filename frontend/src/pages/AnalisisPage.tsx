@@ -21,7 +21,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-dark-card border border-dark-border rounded-lg px-4 py-3 shadow-xl text-sm">
-      <p className="font-semibold text-white mb-2">{label}</p>
+      <p className="font-semibold text-foreground mb-2">{label}</p>
       {payload.map((p: any, i: number) => (
         <p key={i} style={{ color: p.color || p.fill }}>
           {p.name}: <span className="font-bold">{p.value}</span>
@@ -40,11 +40,11 @@ function KpiCard({ label, value, suffix = '', sub, icon: Icon, accent }: {
     <div className="card p-5">
       <div className="flex justify-between items-start">
         <div>
-          <p className="text-xs text-slate-400 mb-1">{label}</p>
-          <p className="text-3xl font-bold text-white">
-            {value}<span className="text-xl text-slate-400 ml-0.5">{suffix}</span>
+          <p className="text-xs text-muted-foreground mb-1">{label}</p>
+          <p className="text-3xl font-bold text-foreground">
+            {value}<span className="text-xl text-muted-foreground ml-0.5">{suffix}</span>
           </p>
-          {sub && <p className="text-xs text-slate-500 mt-1">{sub}</p>}
+          {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
         </div>
         <div className={`p-3 rounded-xl ${accent}`}>
           <Icon size={20} />
@@ -69,8 +69,8 @@ function PeriodSelector({ value, onChange }: { value: string; onChange: (v: 'day
           onClick={() => onChange(o.v)}
           className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
             value === o.v
-              ? 'bg-primary-600 text-white'
-              : 'text-slate-400 hover:text-white'
+              ? 'bg-primary-600 text-foreground'
+              : 'text-muted-foreground hover:text-foreground'
           }`}
         >
           {o.label}
@@ -148,8 +148,8 @@ export default function AnalisisPage() {
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Analisis</h1>
-        <p className="text-sm text-slate-400 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Analisis</h1>
+        <p className="text-sm text-muted-foreground mt-1">
           Data mendalam tentang performa IT Helpdesk
         </p>
       </div>
@@ -164,7 +164,7 @@ export default function AnalisisPage() {
           <KpiCard
             label="Total Tiket" value={kpi.totalTickets}
             sub="Semua waktu" icon={Ticket}
-            accent="bg-primary-500/15 text-primary-400"
+            accent="bg-primary-500/15 text-primary"
           />
           <KpiCard
             label="Tiket Aktif" value={kpi.openTickets}
@@ -189,8 +189,8 @@ export default function AnalisisPage() {
       <div className="card p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
           <div>
-            <h2 className="text-base font-semibold text-white">Tren Tiket Masuk & Selesai</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Volume tiket dari waktu ke waktu</p>
+            <h2 className="text-base font-semibold text-foreground">Tren Tiket Masuk & Selesai</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">Volume tiket dari waktu ke waktu</p>
           </div>
           <PeriodSelector value={trendPeriod} onChange={setTrendPeriod} />
         </div>
@@ -235,7 +235,7 @@ export default function AnalisisPage() {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Category Pie Chart */}
         <div className="card p-6">
-          <h2 className="text-base font-semibold text-white mb-5">Distribusi per Kategori</h2>
+          <h2 className="text-base font-semibold text-foreground mb-5">Distribusi per Kategori</h2>
           {isLoading ? (
             <div className="h-60 skeleton rounded-xl" />
           ) : (
@@ -262,7 +262,7 @@ export default function AnalisisPage() {
                   .map((cat, i) => (
                     <div key={cat.category} className="flex items-center gap-2">
                       <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }} />
-                      <span className="text-xs text-slate-300 flex-1 truncate">{cat.category}</span>
+                      <span className="text-xs text-foreground flex-1 truncate">{cat.category}</span>
                       <span className="text-xs font-bold text-slate-100 flex-shrink-0">{cat.count}</span>
                     </div>
                   ))}
@@ -273,7 +273,7 @@ export default function AnalisisPage() {
 
         {/* Top Issues */}
         <div className="card p-6">
-          <h2 className="text-base font-semibold text-white mb-5">Top 8 Keluhan Terbanyak</h2>
+          <h2 className="text-base font-semibold text-foreground mb-5">Top 8 Keluhan Terbanyak</h2>
           {isLoading ? (
             <div className="h-60 skeleton rounded-xl" />
           ) : (
@@ -302,7 +302,7 @@ export default function AnalisisPage() {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Department volume */}
         <div className="card p-6">
-          <h2 className="text-base font-semibold text-white mb-5">Volume Tiket per Departemen</h2>
+          <h2 className="text-base font-semibold text-foreground mb-5">Volume Tiket per Departemen</h2>
           {isLoading ? (
             <div className="h-56 skeleton rounded-xl" />
           ) : (
@@ -327,13 +327,13 @@ export default function AnalisisPage() {
 
         {/* Technician performance table */}
         <div className="card p-6 flex flex-col">
-          <h2 className="text-base font-semibold text-white mb-4">Performa Teknisi</h2>
+          <h2 className="text-base font-semibold text-foreground mb-4">Performa Teknisi</h2>
           {isLoading ? (
             <div className="flex-1 skeleton rounded-xl" />
           ) : (
             <div className="overflow-y-auto custom-scrollbar flex-1">
               <table className="w-full text-sm">
-                <thead className="text-xs text-slate-400 uppercase">
+                <thead className="text-xs text-muted-foreground uppercase">
                   <tr>
                     <th className="pb-3 text-left font-semibold">Teknisi</th>
                     <th className="pb-3 text-right font-semibold">Total</th>
@@ -349,23 +349,23 @@ export default function AnalisisPage() {
                       <tr key={tech.id} className="hover:bg-slate-800/40 transition-colors">
                         <td className="py-2.5">
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px] text-slate-500 w-4">#{idx + 1}</span>
+                            <span className="text-[10px] text-muted-foreground w-4">#{idx + 1}</span>
                             <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
                               style={{ backgroundColor: PIE_COLORS[idx % PIE_COLORS.length] + '33', color: PIE_COLORS[idx % PIE_COLORS.length] }}
                             >
                               {tech.name.charAt(0)}
                             </div>
-                            <span className="text-slate-200 text-xs truncate max-w-[100px]">{tech.name}</span>
+                            <span className="text-foreground text-xs truncate max-w-[100px]">{tech.name}</span>
                           </div>
                         </td>
-                        <td className="py-2.5 text-right text-slate-300 text-xs">{tech.totalTickets}</td>
+                        <td className="py-2.5 text-right text-foreground text-xs">{tech.totalTickets}</td>
                         <td className="py-2.5 text-right text-emerald-400 text-xs">{tech.resolvedTickets}</td>
                         <td className="py-2.5 text-right text-xs font-bold"
                           style={{ color: tech.slaCompliance >= 90 ? '#10b981' : tech.slaCompliance >= 70 ? '#eab308' : '#ef4444' }}
                         >
                           {tech.slaCompliance}%
                         </td>
-                        <td className="py-2.5 text-right text-slate-400 text-xs">{tech.avgResolutionTime}</td>
+                        <td className="py-2.5 text-right text-muted-foreground text-xs">{tech.avgResolutionTime}</td>
                       </tr>
                     ))}
                 </tbody>

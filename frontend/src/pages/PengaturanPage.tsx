@@ -150,7 +150,7 @@ export default function PengaturanPage() {
         {/* Avatar & Name display */}
         <div className="flex items-center gap-5 mb-6">
           <div
-            className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold text-white shadow-lg shrink-0"
+            className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold text-foreground shadow-lg shrink-0"
             style={{ background: 'var(--primary)' }}
           >
             {user?.name?.charAt(0).toUpperCase() || 'U'}

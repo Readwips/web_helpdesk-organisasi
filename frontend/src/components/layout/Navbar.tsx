@@ -93,7 +93,7 @@ export default function Navbar({ title, subtitle, onMenuToggle }: NavbarProps) {
 
         {/* User Avatar (desktop) */}
         <div
-          className="hidden sm:flex w-8 h-8 rounded-full items-center justify-center text-sm font-bold text-white ml-1"
+          className="hidden sm:flex w-8 h-8 rounded-full items-center justify-center text-sm font-bold text-foreground ml-1"
           style={{ background: 'var(--primary)' }}
           title={user?.name}
         >

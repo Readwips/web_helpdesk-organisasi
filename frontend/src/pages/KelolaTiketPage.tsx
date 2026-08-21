@@ -90,13 +90,13 @@ export default function KelolaTiketPage() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Kelola Tiket</h1>
-          <p className="text-sm text-slate-400 mt-1">Manajemen operasional tiket aktif</p>
+          <h1 className="text-2xl font-bold text-foreground">Kelola Tiket</h1>
+          <p className="text-sm text-muted-foreground mt-1">Manajemen operasional tiket aktif</p>
         </div>
         <div className="flex items-center gap-2">
           <button 
             onClick={() => setShowFilters(!showFilters)}
-            className={`btn-secondary ${showFilters ? 'bg-primary-600/20 text-primary-400 border-primary-600/30' : ''}`}
+            className={`btn-secondary ${showFilters ? 'bg-primary-600/20 text-primary border-primary-600/30' : ''}`}
           >
             <Filter size={16} /> Filter
           </button>
@@ -117,9 +117,9 @@ export default function KelolaTiketPage() {
       {showFilters && (
         <div className="card p-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 animate-slide-in">
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Pencarian</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Pencarian</label>
             <div className="relative">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="Cari ID, Issue..."
@@ -130,7 +130,7 @@ export default function KelolaTiketPage() {
             </div>
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Status Tiket Aktif</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Status Tiket Aktif</label>
             <select
               className="select text-sm"
               value={filters.status || ''}
@@ -144,7 +144,7 @@ export default function KelolaTiketPage() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Prioritas</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Prioritas</label>
             <select
               className="select text-sm"
               value={filters.priority || ''}
@@ -179,14 +179,14 @@ export default function KelolaTiketPage() {
           tickets.map((ticket: Ticket) => (
             <div key={ticket.id} className="card p-5 hover:border-primary-500/50 transition-colors flex flex-col">
               <div className="flex justify-between items-start mb-3">
-                <span className="font-mono text-sm text-primary-400 font-medium">
+                <span className="font-mono text-sm text-primary font-medium">
                   {ticket.ticketId}
                 </span>
                 <span className={statusClass[ticket.status]}>{ticket.status}</span>
               </div>
               
               <h3 
-                className="font-medium mb-1 line-clamp-2 text-sm cursor-pointer hover:text-primary-400 transition-colors" 
+                className="font-medium mb-1 line-clamp-2 text-sm cursor-pointer hover:text-primary transition-colors" 
                 style={{ color: 'var(--foreground)' }}
                 title={ticket.issue}
                 onClick={() => {

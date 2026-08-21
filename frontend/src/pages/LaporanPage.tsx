@@ -27,8 +27,8 @@ function StatCard({ label, value, suffix = '', icon: Icon, color }: {
         <Icon size={22} />
       </div>
       <div>
-        <p className="text-xs text-slate-400">{label}</p>
-        <p className="text-2xl font-bold text-white">{value}<span className="text-base text-slate-400 ml-1">{suffix}</span></p>
+        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className="text-2xl font-bold text-foreground">{value}<span className="text-base text-muted-foreground ml-1">{suffix}</span></p>
       </div>
     </div>
   );
@@ -109,8 +109,8 @@ export default function LaporanPage() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Laporan</h1>
-          <p className="text-sm text-slate-400 mt-1">Ringkasan & ekspor data tiket berdasarkan periode</p>
+          <h1 className="text-2xl font-bold text-foreground">Laporan</h1>
+          <p className="text-sm text-muted-foreground mt-1">Ringkasan & ekspor data tiket berdasarkan periode</p>
         </div>
       </div>
 
@@ -118,9 +118,9 @@ export default function LaporanPage() {
       <div className="card p-5 space-y-4">
         <div className="flex flex-col md:flex-row md:items-end gap-4">
           <div className="flex-1">
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Dari Tanggal</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Dari Tanggal</label>
             <div className="relative">
-              <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+              <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="date"
                 className="input pl-9 text-sm"
@@ -130,9 +130,9 @@ export default function LaporanPage() {
             </div>
           </div>
           <div className="flex-1">
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Sampai Tanggal</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Sampai Tanggal</label>
             <div className="relative">
-              <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+              <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="date"
                 className="input pl-9 text-sm"
@@ -160,7 +160,7 @@ export default function LaporanPage() {
 
         {/* Quick presets */}
         <div className="flex flex-wrap gap-2">
-          <span className="text-xs text-slate-500 self-center">Cepat:</span>
+          <span className="text-xs text-muted-foreground self-center">Cepat:</span>
           {[
             { label: 'Hari Ini', v: 'today' },
             { label: '7 Hari', v: '7d' },
@@ -172,7 +172,7 @@ export default function LaporanPage() {
             <button
               key={p.v}
               onClick={() => setPreset(p.v as any)}
-              className="px-3 py-1 text-xs rounded-md bg-dark-bg border border-dark-border text-slate-400 hover:text-white hover:border-primary-600/50 transition-colors"
+              className="px-3 py-1 text-xs rounded-md bg-dark-bg border border-dark-border text-muted-foreground hover:text-foreground hover:border-primary-600/50 transition-colors"
             >
               {p.label}
             </button>
@@ -188,7 +188,7 @@ export default function LaporanPage() {
       ) : summary && (
         <>
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-            <StatCard label="Total Tiket" value={summary.totalTickets} icon={Ticket} color="bg-primary-500/15 text-primary-400" />
+            <StatCard label="Total Tiket" value={summary.totalTickets} icon={Ticket} color="bg-primary-500/15 text-primary" />
             <StatCard label="Tiket Selesai" value={summary.resolvedTickets} icon={CheckCircle2} color="bg-emerald-500/15 text-emerald-400" />
             <StatCard label="SLA Terpenuhi" value={summary.slaMet} icon={ShieldCheck} color="bg-blue-500/15 text-blue-400" />
             <StatCard label="SLA Dilanggar" value={summary.slaBreached} icon={ShieldAlert} color="bg-red-500/15 text-red-400" />
@@ -198,8 +198,8 @@ export default function LaporanPage() {
           <div className="card p-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div>
-                <h2 className="text-base font-semibold text-white">Ringkasan Periode</h2>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <h2 className="text-base font-semibold text-foreground">Ringkasan Periode</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
                   {summary.period.from && summary.period.to
                     ? `${summary.period.from} s/d ${summary.period.to}`
                     : 'Semua data'}
@@ -210,23 +210,23 @@ export default function LaporanPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Volume */}
               <div className="space-y-4">
-                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Volume Tiket</h3>
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Volume Tiket</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-400">Total Masuk</span>
-                    <span className="text-white font-bold">{summary.totalTickets}</span>
+                    <span className="text-sm text-muted-foreground">Total Masuk</span>
+                    <span className="text-foreground font-bold">{summary.totalTickets}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-400">Masih Terbuka</span>
+                    <span className="text-sm text-muted-foreground">Masih Terbuka</span>
                     <span className="text-amber-400 font-bold">{summary.openTickets}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-400">Diselesaikan</span>
+                    <span className="text-sm text-muted-foreground">Diselesaikan</span>
                     <span className="text-emerald-400 font-bold">{summary.resolvedTickets}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-400">Tingkat Penyelesaian</span>
-                    <span className="text-white font-bold">
+                    <span className="text-sm text-muted-foreground">Tingkat Penyelesaian</span>
+                    <span className="text-foreground font-bold">
                       {summary.totalTickets > 0
                         ? Math.round((summary.resolvedTickets / summary.totalTickets) * 100)
                         : 0}%
@@ -237,18 +237,18 @@ export default function LaporanPage() {
 
               {/* SLA */}
               <div className="space-y-4">
-                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Kepatuhan SLA</h3>
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Kepatuhan SLA</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-400">SLA Terpenuhi</span>
+                    <span className="text-sm text-muted-foreground">SLA Terpenuhi</span>
                     <span className="text-emerald-400 font-bold">{summary.slaMet}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-400">SLA Dilanggar</span>
+                    <span className="text-sm text-muted-foreground">SLA Dilanggar</span>
                     <span className="text-red-400 font-bold">{summary.slaBreached}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-400">Compliance Rate</span>
+                    <span className="text-sm text-muted-foreground">Compliance Rate</span>
                     <span className={`font-bold text-lg ${complianceColor(summary.slaCompliance)}`}>
                       {summary.slaCompliance}%
                     </span>
@@ -269,14 +269,14 @@ export default function LaporanPage() {
 
               {/* Performance */}
               <div className="space-y-4">
-                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Performa</h3>
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Performa</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-400">Rata-rata Resolusi</span>
-                    <span className="text-white font-bold">{summary.avgResolutionTime} Jam</span>
+                    <span className="text-sm text-muted-foreground">Rata-rata Resolusi</span>
+                    <span className="text-foreground font-bold">{summary.avgResolutionTime} Jam</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-400">Status Compliance</span>
+                    <span className="text-sm text-muted-foreground">Status Compliance</span>
                     <span className={`font-semibold text-sm ${complianceColor(summary.slaCompliance)}`}>
                       {summary.slaCompliance >= 90 ? '✅ Baik' : summary.slaCompliance >= 70 ? '⚠️ Perlu Perhatian' : '🔴 Buruk'}
                     </span>

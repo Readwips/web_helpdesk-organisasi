@@ -22,7 +22,7 @@ const roleLabel: Record<string, string> = {
 
 const actionColor: Record<string, string> = {
   LOGIN: 'text-blue-500 bg-blue-500/10',
-  LOGOUT: 'text-slate-500 bg-slate-500/10',
+  LOGOUT: 'text-muted-foreground bg-slate-500/10',
   CREATE_TICKET: 'text-emerald-500 bg-emerald-500/10',
   UPDATE_TICKET: 'text-amber-500 bg-amber-500/10',
   DELETE_TICKET: 'text-red-500 bg-red-500/10',
@@ -204,7 +204,7 @@ export default function ManajemenAkunPage() {
                 <div key={u.id} className="card p-5 hover:border-primary/50 transition-colors">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style={{ background: 'var(--primary)' }}>
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center text-foreground font-bold" style={{ background: 'var(--primary)' }}>
                         {u.name.charAt(0).toUpperCase()}
                       </div>
                       <div>

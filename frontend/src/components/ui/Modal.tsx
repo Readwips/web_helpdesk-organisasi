@@ -52,10 +52,10 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = 'ma
       >
         {/* Header */}
         <div className="flex justify-between items-center px-6 py-4 border-b border-dark-border flex-shrink-0">
-          <h2 className="text-xl font-semibold text-white">{title}</h2>
+          <h2 className="text-xl font-semibold text-foreground">{title}</h2>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
+            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors"
           >
             <X size={20} />
           </button>

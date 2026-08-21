@@ -40,7 +40,7 @@ export default function NotificationDropdown() {
       >
         <Bell size={18} />
         {unreadCount > 0 && (
-          <span className="absolute top-1.5 right-1.5 flex items-center justify-center w-3.5 h-3.5 text-[9px] font-bold text-white bg-red-500 rounded-full border border-dark-card">
+          <span className="absolute top-1.5 right-1.5 flex items-center justify-center w-3.5 h-3.5 text-[9px] font-bold text-foreground bg-red-500 rounded-full border border-dark-card">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -56,7 +56,7 @@ export default function NotificationDropdown() {
             {unreadCount > 0 && (
               <button 
                 onClick={markAllAsRead}
-                className="text-xs text-primary hover:text-primary-400 flex items-center gap-1"
+                className="text-xs text-primary hover:text-primary flex items-center gap-1"
               >
                 <Check size={12} />
                 Tandai semua dibaca

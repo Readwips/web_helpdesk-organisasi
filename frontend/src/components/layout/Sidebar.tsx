@@ -80,7 +80,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="px-4 py-5 border-b flex items-center justify-between" style={{ borderColor: 'var(--sidebar-border)' }}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg flex items-center justify-center shadow-glow" style={{ background: 'var(--primary)' }}>
-              <MonitorDot size={20} className="text-white" />
+              <MonitorDot size={20} className="text-foreground" />
             </div>
             <div>
               <h1 className="text-sm font-bold leading-tight" style={{ color: 'var(--sidebar-foreground)' }}>Helpdesk</h1>
@@ -127,7 +127,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         {/* User Info */}
         <div className="px-3 py-4 border-t" style={{ borderColor: 'var(--sidebar-border)' }}>
           <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg" style={{ background: 'var(--sidebar-accent)' }}>
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white" style={{ background: 'var(--primary)' }}>
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-foreground" style={{ background: 'var(--primary)' }}>
               {user?.name?.charAt(0) || 'U'}
             </div>
             <div className="flex-1 min-w-0">

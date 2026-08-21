@@ -46,10 +46,10 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary-500 flex items-center justify-center shadow-glow">
-            <MonitorDot size={22} className="text-white" />
+            <MonitorDot size={22} className="text-foreground" />
           </div>
           <div>
-            <h1 className="text-white font-bold text-lg leading-tight">Helpdesk</h1>
+            <h1 className="text-foreground font-bold text-lg leading-tight">Helpdesk</h1>
             <p className="text-primary-300 text-xs">Ticket Analysis System</p>
           </div>
         </div>
@@ -57,7 +57,7 @@ export default function LoginPage() {
         {/* Center Content */}
         <div className="space-y-6">
           <div>
-            <h2 className="text-4xl font-bold text-white leading-tight">
+            <h2 className="text-4xl font-bold text-foreground leading-tight">
               Monitor, Analyze &<br />
               <span className="text-gradient">Manage SLA</span>
             </h2>
@@ -84,7 +84,7 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <p className="text-primary-400/50 text-xs">
+        <p className="text-primary/50 text-xs">
           Helpdesk Ticket Analysis © 2026 · Portfolio Project
         </p>
       </div>
@@ -94,20 +94,20 @@ export default function LoginPage() {
         {/* Mobile logo */}
         <div className="flex items-center gap-3 mb-10 lg:hidden">
           <div className="w-9 h-9 rounded-lg bg-primary-600 flex items-center justify-center">
-            <MonitorDot size={20} className="text-white" />
+            <MonitorDot size={20} className="text-foreground" />
           </div>
-          <h1 className="text-white font-bold">Helpdesk Ticket Analysis</h1>
+          <h1 className="text-foreground font-bold">Helpdesk Ticket Analysis</h1>
         </div>
 
         <div className="max-w-md w-full mx-auto">
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-white">Masuk</h2>
-            <p className="text-slate-400 mt-2">Masukkan kredensial akun Anda</p>
+            <h2 className="text-3xl font-bold text-foreground">Masuk</h2>
+            <p className="text-muted-foreground mt-2">Masukkan kredensial akun Anda</p>
           </div>
 
           {/* Demo accounts */}
           <div className="mb-6 p-4 bg-dark-surface rounded-xl border border-dark-border">
-            <p className="text-xs text-slate-500 mb-3 font-medium uppercase tracking-wider">Demo Akun</p>
+            <p className="text-xs text-muted-foreground mb-3 font-medium uppercase tracking-wider">Demo Akun</p>
             <div className="grid grid-cols-3 gap-2">
               {[
                 { label: 'Admin', email: 'admin@ithelpdesk.id', pass: 'password123' },
@@ -117,7 +117,7 @@ export default function LoginPage() {
                 <button
                   key={demo.label}
                   onClick={() => demoLogin(demo.email, demo.pass)}
-                  className="px-3 py-2 bg-dark-bg rounded-lg text-xs text-slate-300 hover:text-white hover:bg-primary-600/20 border border-dark-border hover:border-primary-600/50 transition-all"
+                  className="px-3 py-2 bg-dark-bg rounded-lg text-xs text-foreground hover:text-foreground hover:bg-primary-600/20 border border-dark-border hover:border-primary-600/50 transition-all"
                 >
                   {demo.label}
                 </button>
@@ -134,7 +134,7 @@ export default function LoginPage() {
             )}
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Email</label>
+              <label className="block text-sm font-medium text-foreground mb-1.5">Email</label>
               <input
                 type="email"
                 value={email}
@@ -147,7 +147,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+              <label className="block text-sm font-medium text-foreground mb-1.5">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -161,7 +161,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -196,8 +196,8 @@ export default function LoginPage() {
             </a>
           </div>
 
-          <p className="mt-4 text-center text-xs text-slate-600">
-            Default password: <code className="text-slate-400 bg-dark-surface px-1 py-0.5 rounded">password123</code>
+          <p className="mt-4 text-center text-xs text-muted-foreground">
+            Default password: <code className="text-muted-foreground bg-dark-surface px-1 py-0.5 rounded">password123</code>
           </p>
         </div>
       </div>

@@ -32,16 +32,16 @@ function KpiCard({ title, value, subtitle, icon: Icon, trend, color }: {
     <div className="kpi-card animate-fade-in">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{title}</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{title}</p>
           <p className={`text-3xl font-bold mt-2 ${color}`}>{value}</p>
-          {subtitle && <p className="text-xs text-slate-500 mt-1">{subtitle}</p>}
+          {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
         </div>
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color.replace('text-', 'bg-').replace('-400', '-500/20').replace('-300', '-500/20')}`}>
           <Icon size={20} className={color} />
         </div>
       </div>
       {trend && (
-        <div className={`flex items-center gap-1 mt-3 text-xs ${trend === 'up' ? 'text-emerald-400' : trend === 'down' ? 'text-red-400' : 'text-slate-500'}`}>
+        <div className={`flex items-center gap-1 mt-3 text-xs ${trend === 'up' ? 'text-emerald-400' : trend === 'down' ? 'text-red-400' : 'text-muted-foreground'}`}>
           {trend === 'up' ? <TrendingUp size={12} /> : trend === 'down' ? <TrendingDown size={12} /> : null}
         </div>
       )}
@@ -119,8 +119,8 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Overview Dashboard</h1>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <h1 className="text-2xl font-bold text-foreground">Overview Dashboard</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
             Terakhir diperbarui: {format(lastUpdated, 'HH:mm:ss', { locale: id })}
           </p>
         </div>
@@ -181,8 +181,8 @@ export default function DashboardPage() {
         <div className="card p-5 lg:col-span-2">
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h3 className="font-semibold text-white">Tren Tiket</h3>
-              <p className="text-xs text-slate-500 mt-0.5">Jumlah tiket berdasarkan waktu</p>
+              <h3 className="font-semibold text-foreground">Tren Tiket</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">Jumlah tiket berdasarkan waktu</p>
             </div>
             <div className="flex gap-1">
               {(['day', 'week', 'month'] as const).map((p) => (
@@ -191,8 +191,8 @@ export default function DashboardPage() {
                   onClick={() => setTrendPeriod(p)}
                   className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
                     trendPeriod === p
-                      ? 'bg-primary-600 text-white'
-                      : 'text-slate-400 hover:text-white hover:bg-dark-border'
+                      ? 'bg-primary-600 text-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-dark-border'
                   }`}
                 >
                   {p === 'day' ? 'Harian' : p === 'week' ? 'Mingguan' : 'Bulanan'}
@@ -219,8 +219,8 @@ export default function DashboardPage() {
         {/* Category Donut */}
         <div className="card p-5">
           <div className="mb-5">
-            <h3 className="font-semibold text-white">Kategori Tiket</h3>
-            <p className="text-xs text-slate-500 mt-0.5">Distribusi per kategori</p>
+            <h3 className="font-semibold text-foreground">Kategori Tiket</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">Distribusi per kategori</p>
           </div>
           <ResponsiveContainer width="100%" height={180}>
             <PieChart>
@@ -249,9 +249,9 @@ export default function DashboardPage() {
               <div key={cat.category} className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full" style={{ background: COLORS[i % COLORS.length] }} />
-                  <span className="text-slate-400">{cat.category}</span>
+                  <span className="text-muted-foreground">{cat.category}</span>
                 </div>
-                <span className="text-slate-300 font-medium">{cat.count}</span>
+                <span className="text-foreground font-medium">{cat.count}</span>
               </div>
             ))}
           </div>
@@ -263,8 +263,8 @@ export default function DashboardPage() {
         {/* Top Issues */}
         <div className="card p-5">
           <div className="mb-5">
-            <h3 className="font-semibold text-white">Top 5 Keluhan</h3>
-            <p className="text-xs text-slate-500 mt-0.5">Masalah paling sering dilaporkan</p>
+            <h3 className="font-semibold text-foreground">Top 5 Keluhan</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">Masalah paling sering dilaporkan</p>
           </div>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={topIssues} layout="vertical">
@@ -284,8 +284,8 @@ export default function DashboardPage() {
         <div className="card p-5">
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h3 className="font-semibold text-white">Tiket SLA Breached</h3>
-              <p className="text-xs text-slate-500 mt-0.5">Tiket yang melewati batas waktu SLA</p>
+              <h3 className="font-semibold text-foreground">Tiket SLA Breached</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">Tiket yang melewati batas waktu SLA</p>
             </div>
             <span className="badge sla-breached">{kpi?.slaBreached} total</span>
           </div>
@@ -302,7 +302,7 @@ export default function DashboardPage() {
               <tbody>
                 {breachedTickets.map((ticket) => (
                   <tr key={ticket.id}>
-                    <td className="font-mono text-xs text-primary-400">{ticket.ticketId}</td>
+                    <td className="font-mono text-xs text-primary">{ticket.ticketId}</td>
                     <td className="max-w-32 truncate" title={ticket.issue}>{ticket.issue}</td>
                     <td>
                       <span className={priorityClass[ticket.priority]}>
@@ -314,7 +314,7 @@ export default function DashboardPage() {
                 ))}
                 {breachedTickets.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="text-center text-slate-500 py-8">
+                    <td colSpan={4} className="text-center text-muted-foreground py-8">
                       🎉 Tidak ada tiket SLA breached
                     </td>
                   </tr>
