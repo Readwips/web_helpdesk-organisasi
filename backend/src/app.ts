@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import prisma from './lib/prisma';
 import { authRoutes } from './routes/auth.routes';
 import { ticketRoutes } from './routes/ticket.routes';
 import { analyticsRoutes } from './routes/analytics.routes';
@@ -39,8 +40,25 @@ app.use('/api/employees', employeeRoutes);
 app.use('/api/public', publicRoutes);
 app.use('/api/notifications', notificationRoutes);
 // Health check (public — must be before masterRoutes)
-app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', message: 'IT Helpdesk API is running', timestamp: new Date() });
+app.get('/api/health', async (_req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({ 
+      status: 'ok', 
+      db: 'connected',
+      hasDbUrl: !!process.env.DATABASE_URL,
+      hasJwt: !!process.env.JWT_SECRET,
+      timestamp: new Date() 
+    });
+  } catch (err: any) {
+    res.status(500).json({ 
+      status: 'error', 
+      db: 'failed',
+      hasDbUrl: !!process.env.DATABASE_URL,
+      hasJwt: !!process.env.JWT_SECRET,
+      error: err.message 
+    });
+  }
 });
 
 app.use('/api', masterRoutes);
