@@ -91,14 +91,7 @@ export default function Navbar({ title, subtitle, onMenuToggle }: NavbarProps) {
           {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
         </button>
 
-        {/* User Avatar (desktop) */}
-        <div
-          className="hidden sm:flex w-8 h-8 rounded-full items-center justify-center text-sm font-bold text-foreground ml-1"
-          style={{ background: 'var(--primary)' }}
-          title={user?.name}
-        >
-          {user?.name?.charAt(0).toUpperCase() || 'U'}
-        </div>
+
       </div>
     </header>
   );
