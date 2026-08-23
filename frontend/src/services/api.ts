@@ -1,8 +1,12 @@
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 
+// Hardcode Vercel backend URL untuk menghindari masalah Environment Variable di Vercel
+const BACKEND_URL = 'https://web-helpdesk-organisasi.vercel.app/api';
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL: BACKEND_URL,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
