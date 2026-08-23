@@ -126,7 +126,7 @@ export const userService = {
 
 // Public services — no auth needed
 import axios from 'axios';
-const publicApi = axios.create({ baseURL: 'http://localhost:5000/api/public' });
+const publicApi = axios.create({ baseURL: 'https://web-helpdesk-organisasi.vercel.app/api/public' });
 
 export const publicService = {
   verifyEmployee: (employeeCode: string) =>
