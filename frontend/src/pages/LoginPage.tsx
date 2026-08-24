@@ -105,25 +105,7 @@ export default function LoginPage() {
             <p className="text-muted-foreground mt-2">Masukkan kredensial akun Anda</p>
           </div>
 
-          {/* Demo accounts */}
-          <div className="mb-6 p-4 bg-dark-surface rounded-xl border border-dark-border">
-            <p className="text-xs text-muted-foreground mb-3 font-medium uppercase tracking-wider">Demo Akun</p>
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { label: 'Admin', email: 'admin@ithelpdesk.id', pass: 'password123' },
-                { label: 'Support', email: 'andi@ithelpdesk.id', pass: 'password123' },
-                { label: 'Manager', email: 'manager@ithelpdesk.id', pass: 'password123' },
-              ].map((demo) => (
-                <button
-                  key={demo.label}
-                  onClick={() => demoLogin(demo.email, demo.pass)}
-                  className="px-3 py-2 bg-dark-bg rounded-lg text-xs text-foreground hover:text-foreground hover:bg-primary-600/20 border border-dark-border hover:border-primary-600/50 transition-all"
-                >
-                  {demo.label}
-                </button>
-              ))}
-            </div>
-          </div>
+
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
@@ -196,9 +178,7 @@ export default function LoginPage() {
             </a>
           </div>
 
-          <p className="mt-4 text-center text-xs text-muted-foreground">
-            Default password: <code className="text-muted-foreground bg-dark-surface px-1 py-0.5 rounded">password123</code>
-          </p>
+
         </div>
       </div>
     </div>

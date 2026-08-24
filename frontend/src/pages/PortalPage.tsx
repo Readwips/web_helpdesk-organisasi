@@ -171,9 +171,7 @@ export default function PortalPage() {
                     required
                     autoFocus
                   />
-                  <p className="text-xs mt-1.5 text-center" style={{ color: 'var(--muted-foreground)' }}>
-                    Contoh: 001, 002, 007
-                  </p>
+
                 </div>
                 <button
                   type="submit"
