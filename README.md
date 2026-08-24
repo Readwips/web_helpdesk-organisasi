@@ -1,93 +1,60 @@
-# IT Helpdesk Ticket Analysis
+# 🚀 IT Helpdesk Ticket Analysis
 
-**IT Helpdesk Ticket Analysis** adalah aplikasi web portfolio untuk mengelola tiket IT Support, menganalisis data, dan memonitoring SLA.
+**IT Helpdesk Ticket Analysis** adalah aplikasi web portfolio *full-stack* tingkat produksi untuk mengelola tiket IT Support, menganalisis data secara *real-time*, memonitoring kepatuhan SLA (Service Level Agreement), dan mengekspor laporan eksternal ke Google Looker Studio.
 
-## Stack Teknologi
+Aplikasi ini telah di-deploy ke Cloud dan dapat diakses langsung tanpa perlu instalasi.
 
-| Layer | Teknologi |
-|-------|-----------|
-| Frontend | React 18 + TypeScript + Vite |
-| Styling | Tailwind CSS 3 |
-| Charts | Recharts |
-| State | Zustand |
-| Backend | Node.js + Express + TypeScript |
-| Database | PostgreSQL |
-| ORM | Prisma 5 |
+---
 
-## Cara Menjalankan
+## 🔗 Live Demo Links
 
-### Prasyarat
-- Node.js v20.x
-- PostgreSQL 15/16 terinstall dan berjalan
-- npm
+*   🖥️ **Frontend (Aplikasi Web):** [https://web-helpdesk-frontend.vercel.app](https://web-helpdesk-frontend.vercel.app)
+*   🎫 **Portal Tiket Pegawai (Public):** [https://web-helpdesk-frontend.vercel.app/portal](https://web-helpdesk-frontend.vercel.app/portal)
+*   ⚙️ **Backend API (Health Check):** [https://web-helpdesk-organisasi.vercel.app/api/health](https://web-helpdesk-organisasi.vercel.app/api/health)
 
-### 1. Setup Database
-
-Pastikan PostgreSQL berjalan, lalu buat database:
-
-```sql
-CREATE DATABASE it_helpdesk;
-```
-
-Atau gunakan psql:
-```bash
-psql -U postgres -c "CREATE DATABASE it_helpdesk;"
-```
-
-### 2. Setup Backend
-
-```bash
-cd backend
-
-# Salin dan edit .env
-copy .env.example .env
-# Edit DATABASE_URL jika password berbeda dari "postgres123"
-
-# Jalankan migrasi database
-npx prisma migrate dev --name init
-
-# Seed data dummy (1200 tiket)
-npx ts-node prisma/seed.ts
-
-# Jalankan server
-npm run dev
-```
-
-Backend berjalan di: http://localhost:5000
-
-### 3. Setup Frontend
-
-```bash
-cd frontend
-
-# Jalankan dev server
-npm run dev
-```
-
-Frontend berjalan di: http://localhost:5173
-
-### 4. Login
+### 🔐 Demo Akun Login (Admin/Staff)
+Silakan gunakan kredensial berikut untuk masuk ke dalam *dashboard* utama:
 
 | Role | Email | Password |
 |------|-------|----------|
-| Admin | admin@ithelpdesk.id | password123 |
-| IT Support | andi@ithelpdesk.id | password123 |
-| Manager | manager@ithelpdesk.id | password123 |
+| **Admin** | `admin@ithelpdesk.id` | `password123` |
+| **IT Support** | `andi@ithelpdesk.id` | `password123` |
+| **Manager** | `manager@ithelpdesk.id` | `password123` |
 
-## Fitur (Phase 1 — Selesai)
-- [x] Authentication (login/logout, JWT)
-- [x] Dashboard dengan KPI cards
-- [x] Tren tiket (line chart)
-- [x] Distribusi kategori (donut chart)
-- [x] Top 5 keluhan (bar chart)
-- [x] Daftar tiket SLA breached
-- [x] Database schema + seed 1200 tiket
-- [x] Sidebar navigation
-- [x] Responsive layout (desktop priority)
+### 🎫 Akun Portal (Untuk Buat Tiket)
+Untuk mengetes pembuatan tiket dari sisi pegawai (tanpa login), gunakan **Nomor Pegawai** berikut di halaman Portal:
+*   `001`, `002`, `003`, hingga `007`.
 
-## Roadmap Phase Berikutnya
-- Phase 2: Kelola Tiket (CRUD + filter + pagination)
-- Phase 3: Kepatuhan SLA
-- Phase 4: Analytics lengkap
-- Phase 5: Import CSV/Excel + Export laporan
-- Phase 6: Polish + responsive
+---
+
+## 🛠️ Stack Teknologi Terkini
+
+Aplikasi ini menggunakan teknologi modern yang sangat skalabel:
+
+| Layer | Teknologi |
+|-------|-----------|
+| **Frontend** | React 18, TypeScript, Vite |
+| **Styling** | Tailwind CSS 3 (Full Dark Mode Support) |
+| **State Management**| Zustand |
+| **Backend** | Node.js, Express, TypeScript (Serverless Ready) |
+| **Database** | PostgreSQL (Supabase) + Transaction Pooler |
+| **ORM** | Prisma 5 |
+| **Deployment** | Vercel (Front & Back) |
+
+---
+
+## ✨ Fitur Utama (Selesai)
+
+Aplikasi ini telah menyelesaikan semua fase pengembangannya:
+- [x] **Authentication & Role-Based Access** (Admin, Manager, Staff).
+- [x] **Manajemen Tiket (CRUD)** dengan status penyelesaian dan filter.
+- [x] **Kepatuhan SLA (Service Level Agreement)** otomatis berdasarkan tingkat prioritas.
+- [x] **Analytics & Dashboard Interaktif** menggunakan *Recharts* (Tren waktu, metrik SLA, distribusi kategori).
+- [x] **Portal Pegawai Publik** dengan validasi nomor kepegawaian.
+- [x] **Export/Import Excel (XLSX)** dengan format ISO 8601 yang dioptimasi khusus untuk *Google Looker Studio*.
+- [x] **Dark/Light Mode Theme** terintegrasi menggunakan *CSS Variables*.
+- [x] **Database Seeding** dengan 1.200 data tiket simulasi untuk keperluan demo analitik.
+
+---
+
+*(Readme ini telah diperbarui untuk mencerminkan status proyek yang sudah Live Deployment di Vercel).*
