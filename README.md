@@ -19,6 +19,10 @@ Silakan gunakan kredensial berikut untuk masuk ke dalam *dashboard* utama:
 |------|-------|----------|
 | **Admin** | `admin@ithelpdesk.id` | `password123` |
 | **IT Support** | `andi@ithelpdesk.id` | `password123` |
+| **IT Support** | `budi@ithelpdesk.id` | `password123` |
+| **IT Support** | `citra@ithelpdesk.id` | `password123` |
+| **IT Support** | `dimas@ithelpdesk.id` | `password123` |
+| **IT Support** | `eka@ithelpdesk.id` | `password123` |
 | **Manager** | `manager@ithelpdesk.id` | `password123` |
 
 ### 🎫 Akun Portal (Untuk Buat Tiket)
