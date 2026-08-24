@@ -1,8 +1,6 @@
 # 🚀 IT Helpdesk Ticket Analysis
 
-**IT Helpdesk Ticket Analysis** adalah aplikasi web portfolio *full-stack* tingkat produksi untuk mengelola tiket IT Support, menganalisis data secara *real-time*, memonitoring kepatuhan SLA (Service Level Agreement), dan mengekspor laporan eksternal ke Google Looker Studio.
-
-Aplikasi ini telah di-deploy ke Cloud dan dapat diakses langsung tanpa perlu instalasi.
+**IT Helpdesk Ticket Analysis** adalah aplikasi web *full-stack* untuk mengelola tiket IT Support, menganalisis data secara *real-time*, memonitoring kepatuhan SLA (Service Level Agreement), dan mengekspor laporan dalam bbentuk excel
 
 ---
 
@@ -31,9 +29,9 @@ Untuk mengetes pembuatan tiket dari sisi pegawai (tanpa login), gunakan **Nomor 
 
 ---
 
-## 🛠️ Stack Teknologi Terkini
+## 🛠️ Stack Teknologi
 
-Aplikasi ini menggunakan teknologi modern yang sangat skalabel:
+Aplikasi ini menggunakan :
 
 | Layer | Teknologi |
 |-------|-----------|
@@ -47,9 +45,9 @@ Aplikasi ini menggunakan teknologi modern yang sangat skalabel:
 
 ---
 
-## ✨ Fitur Utama (Selesai)
+## ✨ Fitur Utama
 
-Aplikasi ini telah menyelesaikan semua fase pengembangannya:
+Fase pengembangan yang telah diselesaikan :
 - [x] **Authentication & Role-Based Access** (Admin, Manager, Staff).
 - [x] **Manajemen Tiket (CRUD)** dengan status penyelesaian dan filter.
 - [x] **Kepatuhan SLA (Service Level Agreement)** otomatis berdasarkan tingkat prioritas.
@@ -60,5 +58,3 @@ Aplikasi ini telah menyelesaikan semua fase pengembangannya:
 - [x] **Database Seeding** dengan 1.200 data tiket simulasi untuk keperluan demo analitik.
 
 ---
-
-*(Readme ini telah diperbarui untuk mencerminkan status proyek yang sudah Live Deployment di Vercel).*
