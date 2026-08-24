@@ -62,7 +62,7 @@ export default function LoginPage() {
               <span className="text-gradient">Manage SLA</span>
             </h2>
             <p className="mt-4 text-primary-200/70 text-lg leading-relaxed">
-              Platform analitik Helpdesk untuk memantau performa tim, mengelola tiket, 
+              Platform analitik untuk memantau performa tim, mengelola tiket, 
               dan menganalisis tren masalah secara real-time.
             </p>
           </div>
