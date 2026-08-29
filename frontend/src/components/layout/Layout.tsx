@@ -28,7 +28,7 @@ export default function Layout() {
     return partialMatch ? pageTitles[partialMatch] : { title: 'Helpdesk', subtitle: '' };
   };
 
-  const { title, subtitle } = getPageInfo();
+  const { title } = getPageInfo();
 
   useEffect(() => {
     document.title = `${title} | IT Helpdesk`;
@@ -38,7 +38,7 @@ export default function Layout() {
     <div className="flex h-screen overflow-hidden" style={{ background: 'var(--background)' }}>
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Navbar title={title} subtitle={subtitle} onMenuToggle={() => setSidebarOpen(true)} />
+        <Navbar onMenuToggle={() => setSidebarOpen(true)} />
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
           <div className="animate-fade-in">
             <Outlet />

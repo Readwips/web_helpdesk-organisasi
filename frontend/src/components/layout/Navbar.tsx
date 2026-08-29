@@ -4,12 +4,10 @@ import { useAuthStore } from '../../store/authStore';
 import NotificationDropdown from './NotificationDropdown';
 
 interface NavbarProps {
-  title: string;
-  subtitle?: string;
   onMenuToggle?: () => void;
 }
 
-export default function Navbar({ title, subtitle, onMenuToggle }: NavbarProps) {
+export default function Navbar({ onMenuToggle }: NavbarProps) {
   const { user } = useAuthStore();
   const [isDarkMode, setIsDarkMode] = useState(true);
 
@@ -35,32 +33,14 @@ export default function Navbar({ title, subtitle, onMenuToggle }: NavbarProps) {
       className="h-14 md:h-16 border-b flex items-center justify-between px-4 md:px-6 shrink-0"
       style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
     >
-      {/* Left: hamburger + title */}
-      <div className="flex items-center gap-3">
-        {/* Hamburger (mobile only) */}
-        <button
-          onClick={onMenuToggle}
-          className="lg:hidden p-2 rounded-lg transition-colors"
-          style={{ color: 'var(--muted-foreground)' }}
-          aria-label="Buka menu"
-        >
-          <Menu size={20} />
-        </button>
-
-        <div>
-          <h2
-            className="text-base md:text-lg font-semibold leading-tight"
-            style={{ color: 'var(--foreground)' }}
-          >
-            {title}
-          </h2>
-          {subtitle && (
-            <p className="text-xs hidden sm:block" style={{ color: 'var(--muted-foreground)' }}>
-              {subtitle}
-            </p>
-          )}
-        </div>
-      </div>
+      <button
+        onClick={onMenuToggle}
+        className="lg:hidden p-2 rounded-lg transition-colors"
+        style={{ color: 'var(--muted-foreground)' }}
+        aria-label="Buka menu"
+      >
+        <Menu size={20} aria-hidden="true" />
+      </button>
 
       {/* Right */}
       <div className="flex items-center gap-2">
