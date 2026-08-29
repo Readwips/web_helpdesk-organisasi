@@ -68,6 +68,11 @@
   * {
     border-color: var(--border);
   }
+
+  :focus-visible {
+    outline: 3px solid var(--ring);
+    outline-offset: 2px;
+  }
   
   body {
     background-color: var(--background);
@@ -305,4 +310,13 @@
   .custom-scrollbar::-webkit-scrollbar { width: 4px; }
   .custom-scrollbar::-webkit-scrollbar-track { @apply bg-transparent; }
   .custom-scrollbar::-webkit-scrollbar-thumb { @apply bg-slate-700 rounded-full; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }

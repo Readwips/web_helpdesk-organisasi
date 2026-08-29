@@ -9,26 +9,16 @@ import { format } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
 import toast from 'react-hot-toast';
 import TicketDetailModal from '../components/ticket/TicketDetailModal';
-
-const statusClass: Record<string, string> = {
-  OPEN: 'badge-open', IN_PROGRESS: 'badge-in-progress',
-  PENDING: 'badge-pending', RESOLVED: 'badge-resolved', CLOSED: 'badge-closed',
-};
-
-const priorityClass: Record<string, string> = {
-  CRITICAL: 'priority-critical', HIGH: 'priority-high',
-  MEDIUM: 'priority-medium', LOW: 'priority-low',
-};
-
-const slaClass: Record<string, string> = {
-  MET: 'sla-met', BREACHED: 'sla-breached', PENDING: 'sla-pending',
-};
+import AsyncState from '../components/ui/AsyncState';
+import { priorityClass, slaClass, statusClass } from '../utils/visuals';
+import { getApiError } from '../services/api';
 
 export default function DataTiketPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 10, total: 0, totalPages: 1 });
   const [filters, setFilters] = useState<TicketFilters>({ page: 1, limit: 10 });
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const [isExporting, setIsExporting] = useState(false);
 
   // Modals state
@@ -55,12 +45,13 @@ export default function DataTiketPage() {
 
   const fetchTickets = useCallback(async () => {
     setIsLoading(true);
+    setError('');
     try {
       const res = await ticketService.getAll(filters);
       setTickets(res.data.data);
       if (res.data.pagination) setPagination(res.data.pagination);
-    } catch (error) {
-      toast.error('Gagal mengambil data tiket');
+    } catch (requestError) {
+      setError(getApiError(requestError, 'Gagal mengambil data tiket.'));
     } finally {
       setIsLoading(false);
     }
@@ -211,7 +202,9 @@ export default function DataTiketPage() {
               </tr>
             </thead>
             <tbody>
-              {isLoading ? (
+              {error && !isLoading ? (
+                <tr><td colSpan={8} className="p-4"><AsyncState type="error" title="Gagal memuat data tiket" description={error} onRetry={fetchTickets} /></td></tr>
+              ) : isLoading ? (
                 Array(5).fill(0).map((_, i) => (
                   <tr key={i}>
                     {Array(8).fill(0).map((_, j) => (

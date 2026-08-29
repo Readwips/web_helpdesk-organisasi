@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 import GlobalSearchModal from '../ui/GlobalSearchModal';
@@ -29,6 +29,10 @@ export default function Layout() {
   };
 
   const { title, subtitle } = getPageInfo();
+
+  useEffect(() => {
+    document.title = `${title} | IT Helpdesk`;
+  }, [title]);
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: 'var(--background)' }}>

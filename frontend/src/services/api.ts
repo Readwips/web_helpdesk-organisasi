@@ -1,4 +1,14 @@
 import axios from 'axios';
+
+export const getApiError = (error: unknown, fallback: string) => {
+  if (axios.isAxiosError(error)) {
+    if (!error.response) return 'Tidak dapat terhubung ke server. Periksa koneksi lalu coba lagi.';
+    const message = error.response.data?.message;
+    const requestId = error.response.data?.requestId || error.response.headers?.['x-request-id'];
+    return `${typeof message === 'string' ? message : fallback}${requestId ? ` (ID: ${requestId})` : ''}`;
+  }
+  return fallback;
+};
 import { useAuthStore } from '../store/authStore';
 
 export const API_URL = import.meta.env.VITE_API_URL || '/api';

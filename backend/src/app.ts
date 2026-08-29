@@ -17,6 +17,8 @@ import { employeeRoutes } from './routes/employee.routes';
 import { notificationRoutes } from './routes/notification.routes';
 import { errorHandler } from './middleware/errorHandler';
 import { apiLimiter } from './middleware/rateLimit.middleware';
+import { requestLogger } from './middleware/requestLogger';
+import { logger } from './lib/logger';
 
 dotenv.config();
 
@@ -32,6 +34,7 @@ if (process.env.TRUST_PROXY === 'true') {
   app.set('trust proxy', 1);
 }
 app.use(helmet());
+app.use(requestLogger);
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -66,9 +69,12 @@ app.get('/api/health', async (_req, res) => {
       status: 'ok',
       timestamp: new Date(),
     });
-  } catch {
+  } catch (error) {
+    logger.error('health_database_failure', { requestId: _req.requestId, error });
     res.status(503).json({
       status: 'error',
+      message: 'Database tidak tersedia.',
+      requestId: _req.requestId,
       timestamp: new Date(),
     });
   }

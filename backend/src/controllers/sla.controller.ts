@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
+import { DateQuery, parseDateFilter } from '../utils/dateFilter';
 
 export const getSlaSummary = async (_req: Request, res: Response): Promise<void> => {
   try {
@@ -111,20 +112,26 @@ export const getSlaByTechnician = async (_req: Request, res: Response): Promise<
 };
 
 export const getSlaBreachedTickets = async (req: Request, res: Response): Promise<void> => {
+  const dateWhere = parseDateFilter(req.query as DateQuery, res);
+  if (!dateWhere) return;
   try {
     const { page = '1', limit = '20' } = req.query as { page?: string; limit?: string };
-    const pageNum = parseInt(page);
-    const limitNum = parseInt(limit);
-
+    const pageNum = Number(page);
+    const limitNum = Number(limit);
+    if (!Number.isInteger(pageNum) || pageNum < 1 || !Number.isInteger(limitNum) || limitNum < 1 || limitNum > 100) {
+      res.status(400).json({ success: false, message: 'Page dan limit tidak valid.' });
+      return;
+    }
+    const where = { ...dateWhere, slaStatus: 'BREACHED' as const };
     const [tickets, total] = await Promise.all([
       prisma.ticket.findMany({
-        where: { slaStatus: 'BREACHED' },
+        where,
         skip: (pageNum - 1) * limitNum,
         take: limitNum,
         orderBy: { createdAt: 'desc' },
         include: { category: true, department: true, technician: true },
       }),
-      prisma.ticket.count({ where: { slaStatus: 'BREACHED' } }),
+      prisma.ticket.count({ where }),
     ]);
 
     res.json({

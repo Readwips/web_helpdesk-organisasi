@@ -2,6 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { Users, Plus, Search, Upload, UserCheck, UserX, X, Download } from 'lucide-react';
 import { employeeService } from '../services';
 import toast from 'react-hot-toast';
+import ConfirmDialog from '../components/ui/ConfirmDialog';
+import Modal from '../components/ui/Modal';
+import { getApiError } from '../services/api';
 
 interface Employee {
   id: number;
@@ -23,6 +26,8 @@ export default function ManajemenPegawaiPage() {
   const [showForm, setShowForm] = useState(false);
   const [editEmployee, setEditEmployee] = useState<Employee | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [confirmEmployee, setConfirmEmployee] = useState<Employee | null>(null);
+  const [isToggling, setIsToggling] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({ employeeCode: '', name: '', department: '', position: '' });
@@ -75,13 +80,18 @@ export default function ManajemenPegawaiPage() {
     }
   };
 
-  const toggleActive = async (emp: Employee) => {
+  const toggleActive = async () => {
+    if (!confirmEmployee) return;
+    setIsToggling(true);
     try {
-      await employeeService.update(emp.id, { isActive: !emp.isActive });
-      toast.success(emp.isActive ? 'Pegawai dinonaktifkan' : 'Pegawai diaktifkan');
+      await employeeService.update(confirmEmployee.id, { isActive: !confirmEmployee.isActive });
+      toast.success(confirmEmployee.isActive ? 'Pegawai dinonaktifkan' : 'Pegawai diaktifkan');
+      setConfirmEmployee(null);
       fetchEmployees();
-    } catch {
-      toast.error('Gagal mengubah status pegawai');
+    } catch (error) {
+      toast.error(getApiError(error, 'Gagal mengubah status pegawai.'));
+    } finally {
+      setIsToggling(false);
     }
   };
 
@@ -224,7 +234,8 @@ export default function ManajemenPegawaiPage() {
                     <div className="flex items-center justify-end gap-2">
                       <button onClick={() => openEdit(emp)} className="btn-secondary py-1 px-3 text-xs">Edit</button>
                       <button
-                        onClick={() => toggleActive(emp)}
+                         onClick={() => setConfirmEmployee(emp)}
+                         aria-label={emp.isActive ? `Nonaktifkan ${emp.name}` : `Aktifkan ${emp.name}`}
                         className="py-1 px-2 rounded-md text-xs transition-colors"
                         style={{ background: emp.isActive ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)', color: emp.isActive ? 'rgb(239,68,68)' : 'rgb(34,197,94)' }}
                         title={emp.isActive ? 'Nonaktifkan' : 'Aktifkan'}
@@ -244,6 +255,8 @@ export default function ManajemenPegawaiPage() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog isOpen={!!confirmEmployee} title={confirmEmployee?.isActive ? 'Nonaktifkan pegawai?' : 'Aktifkan pegawai?'} description={`${confirmEmployee?.name || 'Pegawai'} akan ${confirmEmployee?.isActive ? 'kehilangan akses portal' : 'mendapatkan kembali akses portal'}.`} confirmLabel={confirmEmployee?.isActive ? 'Nonaktifkan' : 'Aktifkan'} destructive={!!confirmEmployee?.isActive} isPending={isToggling} onConfirm={toggleActive} onClose={() => setConfirmEmployee(null)} />
 
       {/* Form Modal */}
       {showForm && (

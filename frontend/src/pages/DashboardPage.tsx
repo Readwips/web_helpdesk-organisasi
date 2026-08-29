@@ -1,4 +1,4 @@
-import { useEffect, useState, ElementType } from 'react';
+import { useCallback, useEffect, useRef, useState, ElementType } from 'react';
 import {
   Ticket, TrendingUp, TrendingDown, Clock,
   CheckCircle2, XCircle, AlertTriangle, RefreshCw
@@ -11,18 +11,9 @@ import { analyticsService, slaService } from '../services';
 import { KpiData, TrendData, CategoryData, TopIssueData, Ticket as TicketType } from '../types';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
-
-const statusClass: Record<string, string> = {
-  OPEN: 'badge-open', IN_PROGRESS: 'badge-in-progress',
-  PENDING: 'badge-pending', RESOLVED: 'badge-resolved', CLOSED: 'badge-closed',
-};
-
-const priorityClass: Record<string, string> = {
-  CRITICAL: 'priority-critical', HIGH: 'priority-high',
-  MEDIUM: 'priority-medium', LOW: 'priority-low',
-};
+import AsyncState from '../components/ui/AsyncState';
+import { chartColors as COLORS, priorityClass } from '../utils/visuals';
+import { getApiError } from '../services/api';
 
 function KpiCard({ title, value, subtitle, icon: Icon, trend, color }: {
   title: string; value: string | number; subtitle?: string;
@@ -57,18 +48,30 @@ export default function DashboardPage() {
   const [breachedTickets, setBreachedTickets] = useState<TicketType[]>([]);
   const [trendPeriod, setTrendPeriod] = useState<'day' | 'week' | 'month'>('month');
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const requestGeneration = useRef(0);
+  const activeRequest = useRef<AbortController | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
+    const generation = ++requestGeneration.current;
+    activeRequest.current?.abort();
+    const controller = new AbortController();
+    activeRequest.current = controller;
     setIsLoading(true);
+    setError('');
+    const dates = { ...(dateFrom && { dateFrom }), ...(dateTo && { dateTo }), signal: controller.signal };
     try {
       const [kpiRes, trendRes, catRes, issueRes, breachedRes] = await Promise.all([
-        analyticsService.getKpi(),
-        analyticsService.getTrend(trendPeriod),
-        analyticsService.getCategories(),
-        analyticsService.getTopIssues(5),
-        slaService.getBreached({ page: 1, limit: 8 }),
+        analyticsService.getKpi(dates),
+        analyticsService.getTrend(trendPeriod, dates),
+        analyticsService.getCategories(dates),
+        analyticsService.getTopIssues(5, dates),
+        slaService.getBreached({ page: 1, limit: 8, ...dates }),
       ]);
+      if (generation !== requestGeneration.current) return;
 
       setKpi(kpiRes.data.data);
       setTrend(trendRes.data.data);
@@ -76,16 +79,21 @@ export default function DashboardPage() {
       setTopIssues(issueRes.data.data);
       setBreachedTickets(breachedRes.data.data);
       setLastUpdated(new Date());
-    } catch (error) {
-      console.error('Dashboard fetch error:', error);
+    } catch (requestError) {
+      if (generation === requestGeneration.current && !controller.signal.aborted) setError(getApiError(requestError, 'Dashboard tidak dapat dimuat.'));
     } finally {
-      setIsLoading(false);
+      if (generation === requestGeneration.current) setIsLoading(false);
     }
-  };
+  }, [dateFrom, dateTo, trendPeriod]);
 
   useEffect(() => {
     fetchData();
-  }, [trendPeriod]);
+    return () => activeRequest.current?.abort();
+  }, [fetchData]);
+
+  useEffect(() => {
+    document.title = 'Dashboard | IT Helpdesk';
+  }, []);
 
   const formatTrendDate = (dateStr: string) => {
     try {
@@ -114,8 +122,10 @@ export default function DashboardPage() {
     );
   }
 
+  if (error && !kpi) return <AsyncState type="error" title="Gagal memuat dashboard" description={error} onRetry={fetchData} />;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" aria-busy={isLoading}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -124,14 +134,13 @@ export default function DashboardPage() {
             Terakhir diperbarui: {format(lastUpdated, 'HH:mm:ss', { locale: id })}
           </p>
         </div>
-        <button
-          onClick={fetchData}
-          disabled={isLoading}
-          className="btn-secondary gap-2"
-        >
-          <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
-          Refresh
-        </button>
+        <div className="flex flex-wrap items-end gap-2">
+          <div><label htmlFor="dashboard-date-from" className="block text-xs text-muted-foreground">Dari</label><input id="dashboard-date-from" type="date" className="input mt-1" value={dateFrom} max={dateTo || undefined} onChange={(event) => setDateFrom(event.target.value)} /></div>
+          <div><label htmlFor="dashboard-date-to" className="block text-xs text-muted-foreground">Sampai</label><input id="dashboard-date-to" type="date" className="input mt-1" value={dateTo} min={dateFrom || undefined} onChange={(event) => setDateTo(event.target.value)} /></div>
+          <button onClick={fetchData} disabled={isLoading} className="btn-secondary gap-2" aria-label="Muat ulang dashboard">
+            <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} aria-hidden="true" /> Refresh
+          </button>
+        </div>
       </div>
 
       {/* KPI Cards */}

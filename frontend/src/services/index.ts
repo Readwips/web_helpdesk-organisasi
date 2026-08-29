@@ -21,24 +21,15 @@ export const ticketService = {
     api.delete(`/tickets/${id}`),
 };
 
+type AnalyticsParams = { dateFrom?: string; dateTo?: string; signal?: AbortSignal };
+
 export const analyticsService = {
-  getKpi: (params?: { dateFrom?: string; dateTo?: string }) =>
-    api.get('/analytics/kpi', { params }),
-
-  getTrend: (period: 'day' | 'week' | 'month' = 'month') =>
-    api.get('/analytics/trend', { params: { period } }),
-
-  getCategories: () =>
-    api.get('/analytics/categories'),
-
-  getTopIssues: (limit = 10) =>
-    api.get('/analytics/top-issues', { params: { limit } }),
-
-  getDepartments: () =>
-    api.get('/analytics/departments'),
-
-  getTechnicians: () =>
-    api.get('/analytics/technicians'),
+  getKpi: ({ signal, ...params }: AnalyticsParams = {}) => api.get('/analytics/kpi', { params, signal }),
+  getTrend: (period: 'day' | 'week' | 'month' = 'month', { signal, ...params }: AnalyticsParams = {}) => api.get('/analytics/trend', { params: { period, ...params }, signal }),
+  getCategories: ({ signal, ...params }: AnalyticsParams = {}) => api.get('/analytics/categories', { params, signal }),
+  getTopIssues: (limit = 10, { signal, ...params }: AnalyticsParams = {}) => api.get('/analytics/top-issues', { params: { limit, ...params }, signal }),
+  getDepartments: (params?: AnalyticsParams) => api.get('/analytics/departments', { params }),
+  getTechnicians: (params?: AnalyticsParams) => api.get('/analytics/technicians', { params }),
 };
 
 export const slaService = {
@@ -54,8 +45,8 @@ export const slaService = {
   getByTechnician: () =>
     api.get('/sla/by-technician'),
 
-  getBreached: (params?: { page?: number; limit?: number }) =>
-    api.get('/sla/breached', { params }),
+  getBreached: ({ signal, ...params }: { page?: number; limit?: number; dateFrom?: string; dateTo?: string; signal?: AbortSignal } = {}) =>
+    api.get('/sla/breached', { params, signal }),
 };
 
 export const masterService = {

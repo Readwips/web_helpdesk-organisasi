@@ -12,16 +12,10 @@ import TicketFormModal from '../components/ticket/TicketFormModal';
 import EmptyState from '../components/ui/EmptyState';
 import { useAuthStore } from '../store/authStore';
 import { PERMISSIONS, hasPermission } from '../utils/permissions';
-
-const statusClass: Record<string, string> = {
-  OPEN: 'badge-open', IN_PROGRESS: 'badge-in-progress',
-  PENDING: 'badge-pending', RESOLVED: 'badge-resolved', CLOSED: 'badge-closed',
-};
-
-const priorityClass: Record<string, string> = {
-  CRITICAL: 'priority-critical', HIGH: 'priority-high',
-  MEDIUM: 'priority-medium', LOW: 'priority-low',
-};
+import ConfirmDialog from '../components/ui/ConfirmDialog';
+import AsyncState from '../components/ui/AsyncState';
+import { priorityClass, statusClass } from '../utils/visuals';
+import { getApiError } from '../services/api';
 
 export default function KelolaTiketPage() {
   const { user } = useAuthStore();
@@ -32,6 +26,9 @@ export default function KelolaTiketPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [filters, setFilters] = useState<TicketFilters>({ page: 1, limit: 12, status: 'OPEN,IN_PROGRESS,PENDING' });
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [deleteTicket, setDeleteTicket] = useState<Ticket | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   
   // Modals state
@@ -61,11 +58,12 @@ export default function KelolaTiketPage() {
 
   const fetchTickets = useCallback(async () => {
     setIsLoading(true);
+    setError('');
     try {
       const res = await ticketService.getAll(filters);
       setTickets(res.data.data);
-    } catch (error) {
-      toast.error('Gagal mengambil data tiket');
+    } catch (requestError) {
+      setError(getApiError(requestError, 'Gagal mengambil data tiket.'));
     } finally {
       setIsLoading(false);
     }
@@ -82,8 +80,23 @@ export default function KelolaTiketPage() {
     return () => clearTimeout(timer);
   }, [fetchTickets]);
 
-  const handleFilterChange = (key: keyof TicketFilters, value: any) => {
+  const handleFilterChange = (key: keyof TicketFilters, value: unknown) => {
     setFilters((prev: TicketFilters) => ({ ...prev, [key]: value, page: 1 }));
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTicket) return;
+    setIsDeleting(true);
+    try {
+      await ticketService.delete(deleteTicket.id);
+      toast.success('Tiket berhasil dihapus');
+      setDeleteTicket(null);
+      fetchTickets();
+    } catch (requestError) {
+      toast.error(getApiError(requestError, 'Gagal menghapus tiket.'));
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -162,7 +175,9 @@ export default function KelolaTiketPage() {
 
       {/* Ticket Grid View */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-        {isLoading ? (
+        {error && !isLoading ? (
+          <div className="col-span-full"><AsyncState type="error" title="Gagal memuat tiket" description={error} onRetry={fetchTickets} /></div>
+        ) : isLoading ? (
           Array(8).fill(0).map((_, i) => (
             <div key={i} className="card p-5 h-48 skeleton" />
           ))
@@ -237,17 +252,8 @@ export default function KelolaTiketPage() {
                   <button 
                     className="btn-secondary px-2 py-1.5" 
                     title="Hapus Tiket"
-                    onClick={async () => {
-                      if (window.confirm('Yakin ingin menghapus tiket ini?')) {
-                        try {
-                          await ticketService.delete(ticket.id);
-                          toast.success('Tiket berhasil dihapus');
-                          fetchTickets();
-                        } catch (e) {
-                          toast.error('Gagal menghapus tiket');
-                        }
-                      }
-                    }}
+                    aria-label={`Hapus tiket ${ticket.ticketId}`}
+                    onClick={() => setDeleteTicket(ticket)}
                   >
                     <Trash2 size={14} className="text-red-400" />
                   </button>
@@ -257,6 +263,8 @@ export default function KelolaTiketPage() {
           ))
         )}
       </div>
+
+      <ConfirmDialog isOpen={!!deleteTicket} title="Hapus tiket?" description={`Tiket ${deleteTicket?.ticketId || ''} akan dihapus permanen.`} confirmLabel="Hapus Tiket" destructive isPending={isDeleting} onConfirm={handleDelete} onClose={() => setDeleteTicket(null)} />
 
       <TicketDetailModal 
         isOpen={isDetailOpen} 
