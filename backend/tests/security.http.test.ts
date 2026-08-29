@@ -15,7 +15,7 @@ const prisma = vi.hoisted(() => ({
 vi.mock('../src/lib/prisma', () => ({ default: prisma }));
 vi.mock('../src/utils/activityLogger', () => ({ logActivity: vi.fn() }));
 vi.mock('bcryptjs', () => ({ default: { compare: vi.fn(async (_password: string, hash: string) => hash === 'valid'), hash: vi.fn(async () => 'hashed') } }));
-vi.mock('otplib', () => ({ verifySync: vi.fn(() => ({ valid: true })), generateSecret: vi.fn(() => 'secret'), generateURI: vi.fn(() => 'otpauth://test') }));
+vi.mock('otplib', () => ({ authenticator: { verify: vi.fn(() => true), generateSecret: vi.fn(() => 'secret'), keyuri: vi.fn(() => 'otpauth://test') } }));
 
 import express from 'express';
 import cookieParser from 'cookie-parser';

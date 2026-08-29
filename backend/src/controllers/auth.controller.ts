@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import { generateSecret, generateURI, verifySync } from 'otplib';
+import { authenticator } from 'otplib';
 import prisma from '../lib/prisma';
 import { clearAuthCookies, decryptSecret, encryptSecret, hashToken, randomToken, setAuthCookies } from '../lib/security';
 import { AuthRequest } from '../middleware/auth.middleware';
@@ -62,7 +62,7 @@ export const verifyMfa = async (req: Request, res: Response): Promise<void> => {
     return;
   }
   const user = await prisma.user.findUnique({ where: { id: challenge.userId } });
-  if (!user?.totpEnabled || !user.totpSecretEncrypted || !verifySync({ token: code, secret: decryptSecret(user.totpSecretEncrypted) }).valid) {
+  if (!user?.totpEnabled || !user.totpSecretEncrypted || !authenticator.verify({ token: code, secret: decryptSecret(user.totpSecretEncrypted) })) {
     res.status(401).json({ success: false, message: 'Kode MFA tidak valid.' });
     return;
   }
@@ -96,18 +96,18 @@ export const setupMfa = async (req: AuthRequest, res: Response): Promise<void> =
     res.status(401).json({ success: false, message: 'Reautentikasi gagal.' });
     return;
   }
-  if (user.totpEnabled && (!user.totpSecretEncrypted || !verifySync({ token: String(currentTotpCode || ''), secret: decryptSecret(user.totpSecretEncrypted) }).valid)) {
+  if (user.totpEnabled && (!user.totpSecretEncrypted || !authenticator.verify({ token: String(currentTotpCode || ''), secret: decryptSecret(user.totpSecretEncrypted) }))) {
     res.status(401).json({ success: false, message: 'Kode MFA aktif tidak valid.' });
     return;
   }
-  const secret = generateSecret();
+  const secret = authenticator.generateSecret();
   await prisma.user.update({ where: { id: req.user.id }, data: { pendingTotpSecretEncrypted: encryptSecret(secret), pendingTotpCreatedAt: new Date() } });
-  res.json({ success: true, data: { secret, otpauthUrl: generateURI({ label: req.user.email, issuer: process.env.TOTP_ISSUER || 'IT Helpdesk', secret }) } });
+  res.json({ success: true, data: { secret, otpauthUrl: authenticator.keyuri(req.user.email, process.env.TOTP_ISSUER || 'IT Helpdesk', secret) } });
 };
 
 export const enableMfa = async (req: AuthRequest, res: Response): Promise<void> => {
   const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
-  if (!user?.pendingTotpSecretEncrypted || !user.pendingTotpCreatedAt || user.pendingTotpCreatedAt < new Date(Date.now() - 10 * 60000) || !verifySync({ token: String(req.body.code || ''), secret: decryptSecret(user.pendingTotpSecretEncrypted) }).valid) {
+  if (!user?.pendingTotpSecretEncrypted || !user.pendingTotpCreatedAt || user.pendingTotpCreatedAt < new Date(Date.now() - 10 * 60000) || !authenticator.verify({ token: String(req.body.code || ''), secret: decryptSecret(user.pendingTotpSecretEncrypted) })) {
     res.status(400).json({ success: false, message: 'Kode MFA tidak valid.' });
     return;
   }
