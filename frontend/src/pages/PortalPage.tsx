@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { publicService } from '../services';
 import toast from 'react-hot-toast';
 import { CheckCircle, ArrowLeft, Ticket, AlertCircle, User, Building2, ChevronRight } from 'lucide-react';
@@ -23,6 +23,9 @@ export default function PortalPage() {
   const [step, setStep] = useState<Step>('verify');
   const [employeeCode, setEmployeeCode] = useState('');
   const [employee, setEmployee] = useState<Employee | null>(null);
+  const [verificationToken, setVerificationToken] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const turnstileRef = useRef<HTMLDivElement>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [ticketResult, setTicketResult] = useState<{ ticketId: string; issue: string } | null>(null);
@@ -40,6 +43,19 @@ export default function PortalPage() {
 
   useEffect(() => {
     publicService.getCategories().then(res => setCategories(res.data.data)).catch(() => {});
+    const render = () => {
+      if (window.turnstile && turnstileRef.current && !turnstileRef.current.dataset.rendered) {
+        window.turnstile.render(turnstileRef.current, { sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY || '', callback: setTurnstileToken, 'expired-callback': () => setTurnstileToken('') });
+        turnstileRef.current.dataset.rendered = 'true';
+      }
+    };
+    const script = document.createElement('script');
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+    script.async = true;
+    script.defer = true;
+    script.onload = render;
+    document.head.appendChild(script);
+    return () => script.remove();
   }, []);
 
   const handleCategoryChange = (catId: string) => {
@@ -53,12 +69,15 @@ export default function PortalPage() {
     if (!employeeCode.trim()) return;
     setIsLoading(true);
     try {
-      const res = await publicService.verifyEmployee(employeeCode.trim());
+      const res = await publicService.verifyEmployee(employeeCode.trim(), turnstileToken);
       setEmployee(res.data.data);
+      setVerificationToken(res.data.data.verificationToken);
       setStep('form');
     } catch (err: any) {
       toast.error(err?.response?.data?.message || 'Nomor pegawai tidak ditemukan');
     } finally {
+      setTurnstileToken('');
+      window.turnstile?.reset();
       setIsLoading(false);
     }
   };
@@ -72,7 +91,7 @@ export default function PortalPage() {
     setIsLoading(true);
     try {
       const res = await publicService.createTicket({
-        employeeCode: employee!.employeeCode,
+        verificationToken,
         categoryId: parseInt(form.categoryId),
         subcategoryId: form.subcategoryId ? parseInt(form.subcategoryId) : undefined,
         issue: form.issue,
@@ -173,6 +192,7 @@ export default function PortalPage() {
                   />
 
                 </div>
+                <div ref={turnstileRef} />
                 <button
                   type="submit"
                   className="btn-primary w-full justify-center py-3"

@@ -11,6 +11,8 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [challenge, setChallenge] = useState('');
+  const [mfaCode, setMfaCode] = useState('');
 
   const { login } = useAuthStore();
   const navigate = useNavigate();
@@ -21,10 +23,14 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const res = await authService.login(email, password);
-      const { user, token } = res.data.data;
-      login(user, token);
-      toast.success(`Selamat datang, ${user.name}!`);
+       const res = challenge ? await authService.verifyMfa(challenge, mfaCode) : await authService.login(email, password);
+       if (res.data.data.mfaRequired) {
+         setChallenge(res.data.data.challenge);
+         return;
+       }
+       const { user, csrfToken } = res.data.data;
+       login(user, csrfToken);
+       toast.success(`Selamat datang, ${user.name}!`);
       navigate('/');
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Login gagal. Periksa email dan password Anda.';
@@ -115,8 +121,14 @@ export default function LoginPage() {
               </div>
             )}
 
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Email</label>
+             {challenge && (
+               <div>
+                 <label className="block text-sm font-medium text-foreground mb-1.5">Kode MFA</label>
+                 <input className="input" inputMode="numeric" autoComplete="one-time-code" value={mfaCode} onChange={(e) => setMfaCode(e.target.value)} maxLength={6} required />
+               </div>
+             )}
+             {!challenge && <div>
+               <label className="block text-sm font-medium text-foreground mb-1.5">Email</label>
               <input
                 type="email"
                 value={email}
@@ -126,10 +138,10 @@ export default function LoginPage() {
                 required
                 autoComplete="email"
               />
-            </div>
+             </div>}
 
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Password</label>
+             {!challenge && <div>
+               <label className="block text-sm font-medium text-foreground mb-1.5">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -148,10 +160,10 @@ export default function LoginPage() {
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-            </div>
+             </div>}
 
-            <button
-              type="submit"
+             <button
+               type="submit"
               disabled={isLoading}
               className="btn-primary w-full justify-center py-2.5 text-base"
             >

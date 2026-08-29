@@ -2,17 +2,17 @@ import { Router } from 'express';
 import {
   getTickets, getTicketById, createTicket, updateTicket, deleteTicket, exportTickets
 } from '../controllers/ticket.controller';
-import { authenticate, authorize } from '../middleware/auth.middleware';
+import { authenticate, authorize, requireCsrf } from '../middleware/auth.middleware';
 
 const router = Router();
 
 router.use(authenticate);
 
 router.get('/', getTickets);
-router.get('/export', exportTickets);
+router.get('/export', authorize('ADMIN', 'MANAGER'), exportTickets);
 router.get('/:id', getTicketById);
-router.post('/', createTicket);
-router.put('/:id', updateTicket);
-router.delete('/:id', authorize('ADMIN'), deleteTicket);
+router.post('/', requireCsrf, authorize('ADMIN', 'IT_SUPPORT'), createTicket);
+router.put('/:id', requireCsrf, authorize('ADMIN', 'IT_SUPPORT'), updateTicket);
+router.delete('/:id', requireCsrf, authorize('ADMIN'), deleteTicket);
 
 export { router as ticketRoutes };

@@ -23,7 +23,7 @@ interface ValidationResult {
   invalidCount: number;
   duplicateCount: number;
   preview: PreviewRow[];
-  rawRows: PreviewRow[];
+  jobId: string;
   invalidRows: { row: number; reason: string }[];
 }
 
@@ -75,10 +75,10 @@ export default function ImportPage() {
   };
 
   const handleImport = async () => {
-    if (!validation?.rawRows) return;
+    if (!validation?.jobId) return;
     setIsImporting(true);
     try {
-      const res = await importService.execute(validation.rawRows as Record<string, string>[]);
+      const res = await importService.execute(validation.jobId);
       setImportResult(res.data.data);
       setStep('done');
       toast.success(res.data.message);

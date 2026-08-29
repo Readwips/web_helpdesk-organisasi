@@ -1,37 +1,45 @@
 import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
 import { getSlaTarget } from '../utils/sla.utils';
+import { hashToken, randomToken } from '../lib/security';
+import { createTicketId } from '../utils/ticketId';
 
 // POST /api/public/verify-employee
 export const verifyEmployee = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { employeeCode } = req.body;
+    const { employeeCode, turnstileToken } = req.body;
 
-    if (!employeeCode) {
+    if (!employeeCode || !turnstileToken) {
       res.status(400).json({ success: false, message: 'Nomor pegawai wajib diisi.' });
       return;
     }
 
-    // Pad to 3 digits if numeric
+    const captcha = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ secret: process.env.TURNSTILE_SECRET_KEY || '', response: String(turnstileToken), remoteip: req.ip || '' }),
+    }).then((response) => response.json()) as { success?: boolean };
+    if (!captcha.success) {
+      res.status(403).json({ success: false, message: 'Verifikasi CAPTCHA gagal.' });
+      return;
+    }
     const code = String(employeeCode).padStart(3, '0');
 
     const employee = await prisma.employee.findUnique({
       where: { employeeCode: code },
     });
 
-    if (!employee) {
-      res.status(404).json({ success: false, message: 'Nomor pegawai tidak ditemukan. Hubungi Admin jika ada kesalahan.' });
+    if (!employee || !employee.isActive) {
+      res.status(403).json({ success: false, message: 'Nomor pegawai tidak valid.' });
       return;
     }
 
-    if (!employee.isActive) {
-      res.status(403).json({ success: false, message: 'Akun pegawai ini sudah tidak aktif.' });
-      return;
-    }
-
+    const verificationToken = randomToken();
+    await prisma.verificationToken.create({ data: { employeeId: employee.id, tokenHash: hashToken(verificationToken), expiresAt: new Date(Date.now() + 10 * 60000) } });
     res.json({
       success: true,
       data: {
+        verificationToken,
         id: employee.id,
         employeeCode: employee.employeeCode,
         name: employee.name,
@@ -48,56 +56,33 @@ export const verifyEmployee = async (req: Request, res: Response): Promise<void>
 // POST /api/public/tickets
 export const createPublicTicket = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { employeeCode, categoryId, subcategoryId, issue, description, priority, location } = req.body;
+    const { verificationToken, categoryId, subcategoryId, issue, description, priority, location } = req.body;
 
-    if (!employeeCode || !categoryId || !issue || !priority) {
+    if (!verificationToken || !categoryId || !issue || !priority) {
       res.status(400).json({ success: false, message: 'Field wajib tidak lengkap.' });
       return;
     }
 
-    const code = String(employeeCode).padStart(3, '0');
-
-    // Re-verify employee
-    const employee = await prisma.employee.findUnique({ where: { employeeCode: code } });
+    const token = await prisma.verificationToken.findUnique({ where: { tokenHash: hashToken(String(verificationToken)) } });
+    if (!token || token.consumedAt || token.expiresAt <= new Date()) {
+      res.status(403).json({ success: false, message: 'Token verifikasi tidak valid.' });
+      return;
+    }
+    const employee = await prisma.employee.findUnique({ where: { id: token.employeeId } });
     if (!employee || !employee.isActive) {
       res.status(403).json({ success: false, message: 'Nomor pegawai tidak valid.' });
       return;
     }
 
-    // Get or create department by employee department name
-    let department = await prisma.department.findFirst({
-      where: { name: { equals: employee.department, mode: 'insensitive' } },
+    const result = await prisma.$transaction(async (tx) => {
+      const consumed = await tx.verificationToken.updateMany({ where: { id: token.id, consumedAt: null, expiresAt: { gt: new Date() } }, data: { consumedAt: new Date() } });
+      if (consumed.count !== 1) throw new Error('TOKEN_CONSUMED');
+      let department = await tx.department.findFirst({ where: { name: { equals: employee.department, mode: 'insensitive' } } });
+      if (!department) department = await tx.department.create({ data: { name: employee.department } });
+      const ticket = await tx.ticket.create({ data: { ticketId: createTicketId(), requesterName: employee.name, departmentId: department.id, location: location || null, categoryId: parseInt(categoryId), subcategoryId: subcategoryId ? parseInt(subcategoryId) : null, issue, description: description || null, priority: priority.toUpperCase() as 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW', status: 'OPEN', technicianId: null, slaTarget: getSlaTarget(priority.toUpperCase()), slaStatus: 'PENDING' }, include: { category: true, department: true } });
+      return { department, ticket };
     });
-    if (!department) {
-      department = await prisma.department.create({ data: { name: employee.department } });
-    }
-
-    const count = await prisma.ticket.count();
-    const ticketId = `TKT-${new Date().getFullYear()}-${String(count + 1).padStart(4, '0')}`;
-
-    const slaTarget = getSlaTarget(priority.toUpperCase());
-
-    const ticket = await prisma.ticket.create({
-      data: {
-        ticketId,
-        requesterName: employee.name,
-        departmentId: department.id,
-        location: location || null,
-        categoryId: parseInt(categoryId),
-        subcategoryId: subcategoryId ? parseInt(subcategoryId) : null,
-        issue,
-        description: description || null,
-        priority: priority.toUpperCase() as 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW',
-        status: 'OPEN',
-        technicianId: null,
-        slaTarget,
-        slaStatus: 'PENDING',
-      },
-      include: {
-        category: true,
-        department: true,
-      },
-    });
+    const { department, ticket } = result;
 
     // Notify all IT_SUPPORT and ADMIN users
     const supportUsers = await prisma.user.findMany({

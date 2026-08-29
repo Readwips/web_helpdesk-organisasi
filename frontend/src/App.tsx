@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore';
@@ -16,16 +17,19 @@ import ManajemenAkunPage from './pages/ManajemenAkunPage';
 import ManajemenPegawaiPage from './pages/ManajemenPegawaiPage';
 import PortalPage from './pages/PortalPage';
 import { PERMISSIONS, hasPermission } from './utils/permissions';
+import { authService } from './services';
 
 
 // Route guard
 function PrivateRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, isLoading } = useAuthStore();
+  if (isLoading) return null;
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
 function PublicRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, isLoading } = useAuthStore();
+  if (isLoading) return null;
   return isAuthenticated ? <Navigate to="/" replace /> : <>{children}</>;
 }
 
@@ -38,6 +42,10 @@ function RoleRoute({ children, roles }: { children: React.ReactNode; roles: stri
 }
 
 export default function App() {
+  const { login, logout } = useAuthStore();
+  useEffect(() => {
+    authService.getMe().then((response) => login(response.data.data.user, response.data.data.csrfToken)).catch(logout);
+  }, [login, logout]);
   return (
     <BrowserRouter>
       <Toaster
@@ -89,7 +97,7 @@ export default function App() {
             </RoleRoute>
           } />
 
-          <Route path="/sla" element={<SlaPage />} />
+          <Route path="/sla" element={<RoleRoute roles={PERMISSIONS.PAGE_SLA as unknown as string[]}><SlaPage /></RoleRoute>} />
 
           <Route path="/import" element={
             <RoleRoute roles={PERMISSIONS.PAGE_IMPORT as unknown as string[]}>
@@ -104,7 +112,7 @@ export default function App() {
           } />
 
           <Route path="/pengaturan" element={<PengaturanPage />} />
-          
+
           <Route path="/manajemen-akun" element={
             <RoleRoute roles={PERMISSIONS.PAGE_MANAJEMEN_AKUN as unknown as string[]}>
               <ManajemenAkunPage />

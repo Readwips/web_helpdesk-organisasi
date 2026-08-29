@@ -3,6 +3,7 @@ import prisma from '../lib/prisma';
 import ExcelJS from 'exceljs';
 import { getSlaTarget, calculateResolutionTime, calculateSlaStatus } from '../utils/sla.utils';
 import { logActivity } from '../utils/activityLogger';
+import { createTicketId } from '../utils/ticketId';
 
 interface TicketQuery {
   page?: string;
@@ -40,15 +41,17 @@ export const getTickets = async (req: Request<object, object, object, TicketQuer
     const limitNum = parseInt(limit);
     const skip = (pageNum - 1) * limitNum;
 
-    // Build where clause
     const where: Record<string, unknown> = {};
+    const user = (req as Request & { user?: { role: string; technicianId: number | null } }).user;
+    if (user?.role === 'IT_SUPPORT') where.AND = [{ OR: [{ technicianId: user.technicianId ?? -1 }, { technicianId: null }] }];
 
     if (search) {
-      where.OR = [
+      const searchClause = { OR: [
         { ticketId: { contains: search, mode: 'insensitive' } },
         { requesterName: { contains: search, mode: 'insensitive' } },
         { issue: { contains: search, mode: 'insensitive' } },
-      ];
+      ] };
+      where.AND = [...((where.AND as object[]) || []), searchClause];
     }
 
     if (category) where.category = { name: { equals: category, mode: 'insensitive' } };
@@ -127,6 +130,11 @@ export const getTicketById = async (req: Request, res: Response): Promise<void> 
       res.status(404).json({ success: false, message: 'Tiket tidak ditemukan.' });
       return;
     }
+    const user = (req as Request & { user?: { role: string; technicianId: number | null } }).user;
+    if (user?.role === 'IT_SUPPORT' && ticket.technicianId !== null && ticket.technicianId !== user.technicianId) {
+      res.status(404).json({ success: false, message: 'Tiket tidak ditemukan.' });
+      return;
+    }
 
     res.json({ success: true, data: ticket });
   } catch (error) {
@@ -148,9 +156,7 @@ export const createTicket = async (req: Request & { user?: { id: number; role: s
       return;
     }
 
-    // Generate ticket ID
-    const count = await prisma.ticket.count();
-    const ticketId = `TKT-${new Date().getFullYear()}-${String(count + 1).padStart(4, '0')}`;
+    const ticketId = createTicketId();
     const slaTarget = getSlaTarget(priority.toUpperCase());
 
     // Auto-assign technician based on who is logged in
@@ -201,7 +207,7 @@ export const createTicket = async (req: Request & { user?: { id: number; role: s
   }
 };
 
-export const updateTicket = async (req: Request & { user?: { id: number; role: string } }, res: Response): Promise<void> => {
+export const updateTicket = async (req: Request & { user?: { id: number; role: string; technicianId: number | null } }, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const {
@@ -214,6 +220,11 @@ export const updateTicket = async (req: Request & { user?: { id: number; role: s
 
     if (!existingTicket) {
       res.status(404).json({ success: false, message: 'Tiket tidak ditemukan.' });
+      return;
+    }
+
+    if (req.user?.role === 'IT_SUPPORT' && !req.user.technicianId) {
+      res.status(403).json({ success: false, message: 'Akun teknisi belum terhubung.' });
       return;
     }
 
@@ -244,12 +255,14 @@ export const updateTicket = async (req: Request & { user?: { id: number; role: s
 
     // Auto-assign technician when IT_SUPPORT updates a ticket
     if (req.user?.role === 'IT_SUPPORT') {
-      const userWithTech = await prisma.user.findUnique({
-        where: { id: req.user.id },
-        select: { technicianId: true, name: true },
+      updateData.technicianId = req.user.technicianId;
+      const claimed = await prisma.ticket.updateMany({
+        where: { id: parseInt(String(id)), OR: [{ technicianId: null }, { technicianId: req.user.technicianId }] },
+        data: updateData,
       });
-      if (userWithTech?.technicianId) {
-        updateData.technicianId = userWithTech.technicianId;
+      if (claimed.count !== 1) {
+        res.status(403).json({ success: false, message: 'Akses ditolak. Tiket ditangani teknisi lain.' });
+        return;
       }
     }
 
@@ -413,7 +426,7 @@ export const exportTickets = async (req: Request<object, object, object, TicketQ
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', 'attachment; filename=data-tiket.xlsx');
-    
+
     await workbook.xlsx.write(res);
     res.end();
   } catch (error) {

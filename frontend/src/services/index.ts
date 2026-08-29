@@ -81,13 +81,16 @@ export const importService = {
   validate: (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
-    return api.post('/import/validate', formData, {
+    return api.post('/import/jobs', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
 
-  execute: (rows: Record<string, string>[]) =>
-    api.post('/import/execute', { rows }),
+  execute: (jobId: string) =>
+    api.post(`/import/jobs/${jobId}/execute`),
+
+  getJob: (jobId: string) =>
+    api.get(`/import/jobs/${jobId}`),
 
   downloadTemplate: () =>
     api.get('/import/template', { responseType: 'blob' }),
@@ -96,6 +99,12 @@ export const importService = {
 export const authService = {
   login: (email: string, password: string) =>
     api.post('/auth/login', { email, password }),
+
+  verifyMfa: (challenge: string, code: string) =>
+    api.post('/auth/mfa/verify', { challenge, code }),
+
+  setupMfa: (currentPassword: string, currentTotpCode?: string) => api.post('/auth/mfa/setup', { currentPassword, currentTotpCode }),
+  enableMfa: (code: string) => api.post('/auth/mfa/enable', { code }),
 
   logout: () =>
     api.post('/auth/logout'),
@@ -126,14 +135,15 @@ export const userService = {
 
 // Public services — no auth needed
 import axios from 'axios';
-const publicApi = axios.create({ baseURL: 'https://web-helpdesk-organisasi.vercel.app/api/public' });
+import { API_URL } from './api';
+const publicApi = axios.create({ baseURL: `${API_URL}/public` });
 
 export const publicService = {
-  verifyEmployee: (employeeCode: string) =>
-    publicApi.post('/verify-employee', { employeeCode }),
+  verifyEmployee: (employeeCode: string, turnstileToken: string) =>
+    publicApi.post('/verify-employee', { employeeCode, turnstileToken }),
 
   createTicket: (data: {
-    employeeCode: string;
+    verificationToken: string;
     categoryId: number;
     subcategoryId?: number;
     issue: string;

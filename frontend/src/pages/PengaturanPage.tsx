@@ -45,6 +45,22 @@ export default function PengaturanPage() {
   });
   const [passwordErrors, setPasswordErrors] = useState<FormErrors>({});
   const [isSavingPassword, setIsSavingPassword] = useState(false);
+  const [mfaSetup, setMfaSetup] = useState<{ secret: string; otpauthUrl: string } | null>(null);
+  const [mfaCode, setMfaCode] = useState('');
+  const [mfaPassword, setMfaPassword] = useState('');
+  const [currentMfaCode, setCurrentMfaCode] = useState('');
+
+  const beginMfaSetup = async () => {
+    const response = await authService.setupMfa(mfaPassword, currentMfaCode || undefined);
+    setMfaSetup(response.data.data);
+  };
+
+  const enableMfa = async () => {
+    await authService.enableMfa(mfaCode);
+    setMfaSetup(null);
+    setMfaCode('');
+    toast.success('MFA berhasil diaktifkan');
+  };
 
   const validatePasswords = (): boolean => {
     const errors: FormErrors = {};
@@ -54,8 +70,8 @@ export default function PengaturanPage() {
     }
     if (!passwords.newPassword) {
       errors.newPassword = 'Password baru wajib diisi';
-    } else if (passwords.newPassword.length < 8) {
-      errors.newPassword = 'Password baru minimal 8 karakter';
+    } else if (passwords.newPassword.length < 12) {
+      errors.newPassword = 'Password baru minimal 12 karakter';
     }
     if (!passwords.confirmPassword) {
       errors.confirmPassword = 'Konfirmasi password wajib diisi';
@@ -404,6 +420,20 @@ export default function PengaturanPage() {
           </div>
         </form>
       </div>
+
+      {user?.role === 'ADMIN' && <div className="card p-6 space-y-4">
+        <h2 className="font-semibold" style={{ color: 'var(--foreground)' }}>Autentikasi Dua Faktor</h2>
+        {!mfaSetup ? <>
+          <input className="input" type="password" value={mfaPassword} onChange={(event) => setMfaPassword(event.target.value)} placeholder="Password saat ini" />
+          <input className="input" inputMode="numeric" value={currentMfaCode} onChange={(event) => setCurrentMfaCode(event.target.value)} placeholder="Kode MFA aktif jika mengganti" />
+          <button className="btn-primary" onClick={beginMfaSetup}>Siapkan MFA</button>
+        </> : <>
+          <a className="text-sm break-all" href={mfaSetup.otpauthUrl}>{mfaSetup.otpauthUrl}</a>
+          <p className="font-mono text-sm">{mfaSetup.secret}</p>
+          <input className="input" inputMode="numeric" maxLength={6} value={mfaCode} onChange={(event) => setMfaCode(event.target.value)} placeholder="Kode 6 digit" />
+          <button className="btn-primary" onClick={enableMfa} disabled={mfaCode.length !== 6}>Aktifkan MFA</button>
+        </>}
+      </div>}
 
       {/* System Info Card */}
       <div className="card p-6">

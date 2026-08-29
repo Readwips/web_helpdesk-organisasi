@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { verifyEmployee, createPublicTicket, getPublicCategories } from '../controllers/public.controller';
+import { employeeVerificationLimiter, publicTicketLimiter } from '../middleware/rateLimit.middleware';
 
 const router = Router();
 
-// All public routes - no authentication required
-router.post('/verify-employee', verifyEmployee);
-router.post('/tickets', createPublicTicket);
+router.post('/verify-employee', employeeVerificationLimiter, verifyEmployee);
+router.post('/tickets', publicTicketLimiter, createPublicTicket);
 router.get('/categories', getPublicCategories);
 
 export { router as publicRoutes };

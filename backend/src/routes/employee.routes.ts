@@ -1,14 +1,14 @@
 import { Router } from 'express';
 import { getEmployees, createEmployee, updateEmployee, importEmployees } from '../controllers/employee.controller';
-import { authenticate, authorize } from '../middleware/auth.middleware';
+import { authenticate, authorize, requireCsrf } from '../middleware/auth.middleware';
 
 const router = Router();
 
 router.use(authenticate, authorize('ADMIN'));
 
 router.get('/', getEmployees);
-router.post('/', createEmployee);
-router.put('/:id', updateEmployee);
-router.post('/import', importEmployees);
+router.post('/', requireCsrf, createEmployee);
+router.put('/:id', requireCsrf, updateEmployee);
+router.post('/import', requireCsrf, importEmployees);
 
 export { router as employeeRoutes };

@@ -1,36 +1,24 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { AuthState, User } from '../types';
+import { User } from '../types';
 
-interface AuthStore extends AuthState {
-  login: (user: User, token: string) => void;
+interface AuthStore {
+  user: User | null;
+  csrfToken: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (user: User, csrfToken: string) => void;
   logout: () => void;
   setLoading: (loading: boolean) => void;
   updateUser: (updates: Partial<User>) => void;
 }
 
-export const useAuthStore = create<AuthStore>()(
-  persist(
-    (set) => ({
-      user: null,
-      token: null,
-      isAuthenticated: false,
-      isLoading: false,
-
-      login: (user: User, token: string) =>
-        set({ user, token, isAuthenticated: true, isLoading: false }),
-
-      logout: () =>
-        set({ user: null, token: null, isAuthenticated: false }),
-
-      setLoading: (loading: boolean) => set({ isLoading: loading }),
-
-      updateUser: (updates: Partial<User>) =>
-        set((state) => ({ user: state.user ? { ...state.user, ...updates } : state.user })),
-    }),
-    {
-      name: 'it-helpdesk-auth',
-      partialize: (state) => ({ user: state.user, token: state.token, isAuthenticated: state.isAuthenticated }),
-    }
-  )
-);
+export const useAuthStore = create<AuthStore>((set) => ({
+  user: null,
+  csrfToken: null,
+  isAuthenticated: false,
+  isLoading: true,
+  login: (user, csrfToken) => set({ user, csrfToken, isAuthenticated: true, isLoading: false }),
+  logout: () => set({ user: null, csrfToken: null, isAuthenticated: false, isLoading: false }),
+  setLoading: (isLoading) => set({ isLoading }),
+  updateUser: (updates) => set((state) => ({ user: state.user ? { ...state.user, ...updates } : null })),
+}));

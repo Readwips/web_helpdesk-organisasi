@@ -10,7 +10,7 @@ export const PERMISSIONS = {
   PAGE_KELOLA_TIKET: ['ADMIN', 'IT_SUPPORT'] as UserRole[],
   PAGE_DATA_TIKET:   ['ADMIN', 'IT_SUPPORT', 'MANAGER'] as UserRole[],
   PAGE_ANALISIS:     ['ADMIN', 'MANAGER'] as UserRole[],
-  PAGE_SLA:          ['ADMIN', 'IT_SUPPORT', 'MANAGER'] as UserRole[],
+  PAGE_SLA:          ['ADMIN', 'MANAGER'] as UserRole[],
   PAGE_IMPORT:       ['ADMIN'] as UserRole[],
   PAGE_LAPORAN:      ['ADMIN', 'MANAGER'] as UserRole[],
   PAGE_PENGATURAN:   ['ADMIN', 'IT_SUPPORT', 'MANAGER'] as UserRole[],

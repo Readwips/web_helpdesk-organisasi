@@ -11,24 +11,34 @@ datasource db {
 }
 
 model User {
-  id           Int      @id @default(autoincrement())
-  name         String   @db.VarChar(100)
-  email        String   @unique @db.VarChar(100)
-  password     String   @db.VarChar(255)
-  role         Role     @default(IT_SUPPORT)
-  technicianId Int?     @unique @map("technician_id")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-  activityLogs ActivityLog[]
-  notifications Notification[]
-  technician   Technician? @relation(fields: [technicianId], references: [id])
+  id                         Int            @id @default(autoincrement())
+  name                       String         @db.VarChar(100)
+  email                      String         @unique @db.VarChar(100)
+  password                   String         @db.VarChar(255)
+  role                       Role           @default(IT_SUPPORT)
+  technicianId               Int?           @unique @map("technician_id")
+  createdAt                  DateTime       @default(now()) @map("created_at")
+  updatedAt                  DateTime       @updatedAt @map("updated_at")
+  activityLogs               ActivityLog[]
+  notifications              Notification[]
+  technician                 Technician?    @relation(fields: [technicianId], references: [id])
+  sessions                   Session[]
+  importJobs                 ImportJob[]
+  mfaChallenges              MfaChallenge[]
+  failedLoginAttempts        Int            @default(0) @map("failed_login_attempts")
+  lockedUntil                DateTime?      @map("locked_until")
+  totpSecretEncrypted        String?        @map("totp_secret_encrypted") @db.Text
+  totpEnabled                Boolean        @default(false) @map("totp_enabled")
+  lastTotpStep               BigInt?        @map("last_totp_step")
+  pendingTotpSecretEncrypted String?        @map("pending_totp_secret_encrypted") @db.Text
+  pendingTotpCreatedAt       DateTime?      @map("pending_totp_created_at")
 
   @@map("users")
 }
 
 model Category {
-  id            Int            @id @default(autoincrement())
-  name          String         @unique @db.VarChar(50)
+  id            Int           @id @default(autoincrement())
+  name          String        @unique @db.VarChar(50)
   subcategories Subcategory[]
   tickets       Ticket[]
 
@@ -64,31 +74,31 @@ model Technician {
 }
 
 model Ticket {
-  id               Int        @id @default(autoincrement())
-  ticketId         String     @unique @db.VarChar(20) @map("ticket_id")
-  requesterName    String     @db.VarChar(100) @map("requester_name")
-  departmentId     Int        @map("department_id")
-  location         String?    @db.VarChar(100)
-  categoryId       Int        @map("category_id")
-  subcategoryId    Int?       @map("subcategory_id")
-  issue            String     @db.VarChar(200)
-  description      String?    @db.Text
-  priority         Priority
-  status           Status     @default(OPEN)
-  technicianId     Int?       @map("technician_id")
-  slaTarget        Int        @map("sla_target") // dalam jam
-  resolutionTime   Float?     @map("resolution_time") // dalam jam
-  slaStatus        SlaStatus  @default(PENDING) @map("sla_status")
-  satisfaction     Int?       // 1-5
-  resolutionNotes  String?    @db.Text @map("resolution_notes")
-  createdAt        DateTime   @default(now()) @map("created_at")
-  updatedAt        DateTime   @updatedAt @map("updated_at")
-  resolvedAt       DateTime?  @map("resolved_at")
+  id              Int       @id @default(autoincrement())
+  ticketId        String    @unique @map("ticket_id") @db.VarChar(20)
+  requesterName   String    @map("requester_name") @db.VarChar(100)
+  departmentId    Int       @map("department_id")
+  location        String?   @db.VarChar(100)
+  categoryId      Int       @map("category_id")
+  subcategoryId   Int?      @map("subcategory_id")
+  issue           String    @db.VarChar(200)
+  description     String?   @db.Text
+  priority        Priority
+  status          Status    @default(OPEN)
+  technicianId    Int?      @map("technician_id")
+  slaTarget       Int       @map("sla_target") // dalam jam
+  resolutionTime  Float?    @map("resolution_time") // dalam jam
+  slaStatus       SlaStatus @default(PENDING) @map("sla_status")
+  satisfaction    Int? // 1-5
+  resolutionNotes String?   @map("resolution_notes") @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  resolvedAt      DateTime? @map("resolved_at")
 
-  department   Department  @relation(fields: [departmentId], references: [id])
-  category     Category    @relation(fields: [categoryId], references: [id])
-  subcategory  Subcategory? @relation(fields: [subcategoryId], references: [id])
-  technician   Technician? @relation(fields: [technicianId], references: [id])
+  department  Department   @relation(fields: [departmentId], references: [id])
+  category    Category     @relation(fields: [categoryId], references: [id])
+  subcategory Subcategory? @relation(fields: [subcategoryId], references: [id])
+  technician  Technician?  @relation(fields: [technicianId], references: [id])
 
   @@map("tickets")
 }
@@ -126,7 +136,7 @@ model ActivityLog {
   action      String   @db.VarChar(50)
   description String   @db.VarChar(255)
   metadata    Json?
-  ipAddress   String?  @db.VarChar(45) @map("ip_address")
+  ipAddress   String?  @map("ip_address") @db.VarChar(45)
   createdAt   DateTime @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -135,15 +145,80 @@ model ActivityLog {
 }
 
 model Employee {
-  id           Int      @id @default(autoincrement())
-  employeeCode String   @unique @db.VarChar(20) @map("employee_code")
-  name         String   @db.VarChar(100)
-  department   String   @db.VarChar(100)
-  position     String?  @db.VarChar(100)
-  isActive     Boolean  @default(true) @map("is_active")
-  createdAt    DateTime @default(now()) @map("created_at")
+  id                 Int                 @id @default(autoincrement())
+  employeeCode       String              @unique @map("employee_code") @db.VarChar(20)
+  name               String              @db.VarChar(100)
+  department         String              @db.VarChar(100)
+  position           String?             @db.VarChar(100)
+  isActive           Boolean             @default(true) @map("is_active")
+  createdAt          DateTime            @default(now()) @map("created_at")
+  verificationTokens VerificationToken[]
 
   @@map("employees")
+}
+
+model Session {
+  id        String    @id @default(uuid())
+  userId    Int       @map("user_id")
+  tokenHash String    @unique @map("token_hash") @db.VarChar(64)
+  csrfHash  String    @map("csrf_hash") @db.VarChar(64)
+  expiresAt DateTime  @map("expires_at")
+  revokedAt DateTime? @map("revoked_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model MfaChallenge {
+  id         String    @id @default(uuid())
+  userId     Int       @map("user_id")
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash  String    @unique @map("token_hash") @db.VarChar(64)
+  expiresAt  DateTime  @map("expires_at")
+  consumedAt DateTime? @map("consumed_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@map("mfa_challenges")
+}
+
+model VerificationToken {
+  id         String    @id @default(uuid())
+  employeeId Int       @map("employee_id")
+  employee   Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  tokenHash  String    @unique @map("token_hash") @db.VarChar(64)
+  expiresAt  DateTime  @map("expires_at")
+  consumedAt DateTime? @map("consumed_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  @@index([employeeId])
+  @@map("verification_tokens")
+}
+
+model ImportJob {
+  id           String          @id @default(uuid())
+  userId       Int             @map("user_id")
+  status       ImportJobStatus @default(VALIDATED)
+  payload      Json
+  summary      Json
+  imported     Int             @default(0)
+  failed       Int             @default(0)
+  createdAt    DateTime        @default(now()) @map("created_at")
+  processingAt DateTime?       @map("processing_at")
+  executedAt   DateTime?       @map("executed_at")
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("import_jobs")
+}
+
+enum ImportJobStatus {
+  VALIDATED
+  PROCESSING
+  COMPLETED
+  FAILED
 }
 
 model Notification {
@@ -155,7 +230,7 @@ model Notification {
   link      String?  @db.VarChar(100)
   createdAt DateTime @default(now()) @map("created_at")
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("notifications")
 }

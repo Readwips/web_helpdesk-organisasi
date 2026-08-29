@@ -3,11 +3,11 @@ import {
   getSlaSummary, getSlaByPriority, getSlaByCategory,
   getSlaByTechnician, getSlaBreachedTickets
 } from '../controllers/sla.controller';
-import { authenticate } from '../middleware/auth.middleware';
+import { authenticate, authorize } from '../middleware/auth.middleware';
 
 const router = Router();
 
-router.use(authenticate);
+router.use(authenticate, authorize('ADMIN', 'MANAGER'));
 
 router.get('/summary', getSlaSummary);
 router.get('/by-priority', getSlaByPriority);

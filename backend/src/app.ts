@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import prisma from './lib/prisma';
 import { authRoutes } from './routes/auth.routes';
 import { ticketRoutes } from './routes/ticket.routes';
@@ -14,19 +16,36 @@ import { publicRoutes } from './routes/public.routes';
 import { employeeRoutes } from './routes/employee.routes';
 import { notificationRoutes } from './routes/notification.routes';
 import { errorHandler } from './middleware/errorHandler';
+import { apiLimiter } from './middleware/rateLimit.middleware';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const allowedOrigins = (process.env.CORS_ORIGINS || '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
-// Middleware
+app.disable('x-powered-by');
+if (process.env.TRUST_PROXY === 'true') {
+  app.set('trust proxy', 1);
+}
+app.use(helmet());
 app.use(cors({
-  origin: true, // Mengizinkan semua origin (Vercel Frontend)
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+    callback(new Error('Origin tidak diizinkan.'));
+  },
   credentials: true,
 }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+app.use(cookieParser());
+app.use('/api', apiLimiter);
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -43,20 +62,14 @@ app.use('/api/notifications', notificationRoutes);
 app.get('/api/health', async (_req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
-    res.json({ 
-      status: 'ok', 
-      db: 'connected',
-      hasDbUrl: !!process.env.DATABASE_URL,
-      hasJwt: !!process.env.JWT_SECRET,
-      timestamp: new Date() 
+    res.json({
+      status: 'ok',
+      timestamp: new Date(),
     });
-  } catch (err: any) {
-    res.status(500).json({ 
-      status: 'error', 
-      db: 'failed',
-      hasDbUrl: !!process.env.DATABASE_URL,
-      hasJwt: !!process.env.JWT_SECRET,
-      error: err.message 
+  } catch {
+    res.status(503).json({
+      status: 'error',
+      timestamp: new Date(),
     });
   }
 });
@@ -65,10 +78,5 @@ app.use('/api', masterRoutes);
 
 // Error handler
 app.use(errorHandler);
-
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📊 IT Helpdesk Ticket Analysis API ready`);
-});
 
 export default app;
