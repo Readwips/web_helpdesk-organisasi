@@ -49,8 +49,6 @@ export default function DashboardPage() {
   const [trendPeriod, setTrendPeriod] = useState<'day' | 'week' | 'month'>('month');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const requestGeneration = useRef(0);
   const activeRequest = useRef<AbortController | null>(null);
@@ -62,14 +60,14 @@ export default function DashboardPage() {
     activeRequest.current = controller;
     setIsLoading(true);
     setError('');
-    const dates = { ...(dateFrom && { dateFrom }), ...(dateTo && { dateTo }), signal: controller.signal };
+    const requestOptions = { signal: controller.signal };
     try {
       const [kpiRes, trendRes, catRes, issueRes, breachedRes] = await Promise.all([
-        analyticsService.getKpi(dates),
-        analyticsService.getTrend(trendPeriod, dates),
-        analyticsService.getCategories(dates),
-        analyticsService.getTopIssues(5, dates),
-        slaService.getBreached({ page: 1, limit: 8, ...dates }),
+        analyticsService.getKpi(requestOptions),
+        analyticsService.getTrend(trendPeriod, requestOptions),
+        analyticsService.getCategories(requestOptions),
+        analyticsService.getTopIssues(5, requestOptions),
+        slaService.getBreached({ page: 1, limit: 8, ...requestOptions }),
       ]);
       if (generation !== requestGeneration.current) return;
 
@@ -84,7 +82,7 @@ export default function DashboardPage() {
     } finally {
       if (generation === requestGeneration.current) setIsLoading(false);
     }
-  }, [dateFrom, dateTo, trendPeriod]);
+  }, [trendPeriod]);
 
   useEffect(() => {
     fetchData();
@@ -134,9 +132,7 @@ export default function DashboardPage() {
             Terakhir diperbarui: {format(lastUpdated, 'HH:mm:ss', { locale: id })}
           </p>
         </div>
-        <div className="flex flex-wrap items-end gap-2">
-          <div><label htmlFor="dashboard-date-from" className="block text-xs text-muted-foreground">Dari</label><input id="dashboard-date-from" type="date" className="input mt-1" value={dateFrom} max={dateTo || undefined} onChange={(event) => setDateFrom(event.target.value)} /></div>
-          <div><label htmlFor="dashboard-date-to" className="block text-xs text-muted-foreground">Sampai</label><input id="dashboard-date-to" type="date" className="input mt-1" value={dateTo} min={dateFrom || undefined} onChange={(event) => setDateTo(event.target.value)} /></div>
+        <div className="flex items-center gap-2">
           <button onClick={fetchData} disabled={isLoading} className="btn-secondary gap-2" aria-label="Muat ulang dashboard">
             <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} aria-hidden="true" /> Refresh
           </button>
