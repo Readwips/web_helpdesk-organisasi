@@ -60,16 +60,3 @@ Untuk mengetes pembuatan tiket dari sisi pegawai (tanpa login), gunakan **Nomor 
 - [x] **Database Seeding** dengan data tiket simulasi untuk demo analitik.
 
 ---
-
-## 🛡️ Keamanan
-
-- Sesi disimpan dalam cookie `HttpOnly`, `Secure`, dan `SameSite`.
-- Perlindungan CSRF diterapkan pada operasi yang mengubah data.
-- Rate limit dan lockout sementara melindungi endpoint login.
-- RBAC dan ownership tiket diperiksa di backend, bukan hanya melalui tampilan UI.
-- Portal publik dilindungi Cloudflare Turnstile, rate limit, dan token verifikasi sekali pakai.
-- Impor hanya tersedia untuk Admin serta dibatasi berdasarkan tipe file, ukuran, jumlah baris, dan validasi formula.
-- Helmet, CSP, HSTS, CORS allowlist, dan header keamanan lainnya aktif.
-- Log terstruktur menggunakan request ID tanpa merekam body atau data sensitif.
-- Dependensi `xlsx` yang tidak digunakan dan memiliki advisory telah dihapus.
-- Jangan commit `.env`, password, token, secret, atau backup database ke repository.
