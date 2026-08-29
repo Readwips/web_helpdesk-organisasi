@@ -100,12 +100,6 @@ export const authService = {
   login: (email: string, password: string) =>
     api.post('/auth/login', { email, password }),
 
-  verifyMfa: (challenge: string, code: string) =>
-    api.post('/auth/mfa/verify', { challenge, code }),
-
-  setupMfa: (currentPassword: string, currentTotpCode?: string) => api.post('/auth/mfa/setup', { currentPassword, currentTotpCode }),
-  enableMfa: (code: string) => api.post('/auth/mfa/enable', { code }),
-
   logout: () =>
     api.post('/auth/logout'),
 

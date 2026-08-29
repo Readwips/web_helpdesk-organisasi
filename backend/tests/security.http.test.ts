@@ -7,7 +7,6 @@ const prisma = vi.hoisted(() => ({
   ticket: { findMany: vi.fn(), count: vi.fn(), findUnique: vi.fn(), updateMany: vi.fn(), update: vi.fn(), create: vi.fn() },
   importJob: { create: vi.fn(), findFirst: vi.fn(), updateMany: vi.fn(), update: vi.fn() },
   category: { upsert: vi.fn() }, department: { upsert: vi.fn(), findFirst: vi.fn(), create: vi.fn() }, technician: { findFirst: vi.fn() },
-  mfaChallenge: { findUnique: vi.fn(), create: vi.fn(), update: vi.fn(), updateMany: vi.fn() },
   verificationToken: { findUnique: vi.fn(), updateMany: vi.fn(), create: vi.fn() },
   employee: { findUnique: vi.fn() }, notification: { createMany: vi.fn() },
   $transaction: vi.fn(async (operation) => typeof operation === 'function' ? operation(prisma) : Promise.all(operation)),
@@ -15,7 +14,6 @@ const prisma = vi.hoisted(() => ({
 vi.mock('../src/lib/prisma', () => ({ default: prisma }));
 vi.mock('../src/utils/activityLogger', () => ({ logActivity: vi.fn() }));
 vi.mock('bcryptjs', () => ({ default: { compare: vi.fn(async (_password: string, hash: string) => hash === 'valid'), hash: vi.fn(async () => 'hashed') } }));
-vi.mock('otplib', () => ({ authenticator: { verify: vi.fn(() => true), generateSecret: vi.fn(() => 'secret'), keyuri: vi.fn(() => 'otpauth://test') } }));
 
 import express from 'express';
 import cookieParser from 'cookie-parser';
@@ -23,7 +21,7 @@ import { authRoutes } from '../src/routes/auth.routes';
 import { ticketRoutes } from '../src/routes/ticket.routes';
 import { importRoutes } from '../src/routes/import.routes';
 import { publicRoutes } from '../src/routes/public.routes';
-import { encryptSecret, hashToken } from '../src/lib/security';
+import { hashToken } from '../src/lib/security';
 
 const app = express();
 app.use(express.json());
@@ -40,7 +38,6 @@ const session = (role: string, technicianId: number | null = null) => {
 beforeEach(() => {
   vi.clearAllMocks();
   process.env.COOKIE_SECURE = 'false';
-  process.env.TOTP_ENCRYPTION_KEY = 'test-key';
 });
 
 describe('session and CSRF HTTP seam', () => {
@@ -63,25 +60,14 @@ describe('session and CSRF HTTP seam', () => {
     expect(prisma.user.update).toHaveBeenNthCalledWith(2, expect.objectContaining({ data: { lockedUntil: expect.any(Date) } }));
   });
 
-  it('allows only one concurrent MFA replay to create a session', async () => {
-    prisma.mfaChallenge.findUnique.mockResolvedValue({ id: 'challenge', userId: 1, consumedAt: null, expiresAt: new Date(Date.now() + 60000) });
-    prisma.user.findUnique.mockResolvedValue({ id: 1, name: 'Admin', email: 'admin@test.co', role: 'ADMIN', totpEnabled: true, totpSecretEncrypted: encryptSecret('secret'), lastTotpStep: null });
-    let claimed = false;
-    prisma.mfaChallenge.updateMany.mockImplementation(async () => claimed ? { count: 0 } : (claimed = true, { count: 1 }));
-    prisma.user.updateMany.mockResolvedValue({ count: 1 });
-    prisma.session.create.mockResolvedValue({});
-    const responses = await Promise.all([request(app).post('/auth/mfa/verify').send({ challenge: 'token', code: '123456' }), request(app).post('/auth/mfa/verify').send({ challenge: 'token', code: '123456' })]);
-    expect(responses.map((response) => response.status).sort()).toEqual([200, 401]);
-    expect(prisma.session.create).toHaveBeenCalledTimes(1);
-  });
-
-  it('returns an MFA challenge without creating a session for enabled admin', async () => {
+  it('creates a normal session for an admin with legacy MFA enabled', async () => {
     prisma.user.findUnique.mockResolvedValue({ id: 1, name: 'Admin', email: 'admin@test.co', password: 'valid', role: 'ADMIN', failedLoginAttempts: 0, lockedUntil: null, totpEnabled: true });
     prisma.user.update.mockResolvedValue({});
-    prisma.mfaChallenge.create.mockResolvedValue({});
-    const response = await request(app).post('/auth/login').send({ email: 'admin@test.co', password: 'ok' }).expect(202);
-    expect(response.body.data.mfaRequired).toBe(true);
-    expect(prisma.session.create).not.toHaveBeenCalled();
+    prisma.session.create.mockResolvedValue({});
+    const response = await request(app).post('/auth/login').send({ email: 'admin@test.co', password: 'ok' }).expect(200);
+    expect(response.body.data.user).toEqual({ id: 1, name: 'Admin', email: 'admin@test.co', role: 'ADMIN' });
+    expect(response.headers['set-cookie']).toEqual(expect.arrayContaining([expect.stringContaining('helpdesk_session='), expect.stringContaining('helpdesk_csrf=')]));
+    expect(prisma.session.create).toHaveBeenCalledTimes(1);
   });
 });
 

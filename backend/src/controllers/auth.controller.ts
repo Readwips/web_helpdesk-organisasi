@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import { authenticator } from 'otplib';
 import prisma from '../lib/prisma';
-import { clearAuthCookies, decryptSecret, encryptSecret, hashToken, randomToken, setAuthCookies } from '../lib/security';
+import { clearAuthCookies, hashToken, randomToken, setAuthCookies } from '../lib/security';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { logActivity } from '../utils/activityLogger';
 
@@ -42,77 +41,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     return;
   }
   await prisma.user.update({ where: { id: user.id }, data: { failedLoginAttempts: 0, lockedUntil: null } });
-  if (user.role === 'ADMIN' && user.totpEnabled) {
-    const challenge = randomToken();
-    await prisma.mfaChallenge.create({ data: { userId: user.id, tokenHash: hashToken(challenge), expiresAt: new Date(Date.now() + 5 * 60000) } });
-    res.status(202).json({ success: true, data: { mfaRequired: true, challenge } });
-    return;
-  }
   const csrfToken = await createSession(user.id, res);
   await logActivity(user.id, 'LOGIN', 'Berhasil masuk ke sistem', null, req.ip);
   res.json({ success: true, data: { user: publicUser(user), csrfToken } });
-};
-
-export const verifyMfa = async (req: Request, res: Response): Promise<void> => {
-  const challengeToken = String(req.body.challenge || '');
-  const code = String(req.body.code || '');
-  const challenge = await prisma.mfaChallenge.findUnique({ where: { tokenHash: hashToken(challengeToken) } });
-  if (!challenge || challenge.consumedAt || challenge.expiresAt <= new Date()) {
-    res.status(401).json({ success: false, message: 'Tantangan MFA tidak valid.' });
-    return;
-  }
-  const user = await prisma.user.findUnique({ where: { id: challenge.userId } });
-  if (!user?.totpEnabled || !user.totpSecretEncrypted || !authenticator.verify({ token: code, secret: decryptSecret(user.totpSecretEncrypted) })) {
-    res.status(401).json({ success: false, message: 'Kode MFA tidak valid.' });
-    return;
-  }
-  const step = BigInt(Math.floor(Date.now() / 30000));
-  if (user.lastTotpStep && user.lastTotpStep >= step) {
-    res.status(401).json({ success: false, message: 'Kode MFA sudah digunakan.' });
-    return;
-  }
-  const accepted = await prisma.$transaction(async (tx) => {
-    const challengeResult = await tx.mfaChallenge.updateMany({ where: { id: challenge.id, consumedAt: null, expiresAt: { gt: new Date() } }, data: { consumedAt: new Date() } });
-    const replayResult = await tx.user.updateMany({ where: { id: user.id, OR: [{ lastTotpStep: null }, { lastTotpStep: { lt: step } }] }, data: { lastTotpStep: step } });
-    if (challengeResult.count !== 1 || replayResult.count !== 1) throw new Error('MFA_REPLAY');
-    return true;
-  }).catch(() => false);
-  if (!accepted) {
-    res.status(401).json({ success: false, message: 'Kode MFA sudah digunakan.' });
-    return;
-  }
-  const csrfToken = await createSession(user.id, res);
-  res.json({ success: true, data: { user: publicUser(user), csrfToken } });
-};
-
-export const setupMfa = async (req: AuthRequest, res: Response): Promise<void> => {
-  if (req.user?.role !== 'ADMIN') {
-    res.status(403).json({ success: false, message: 'Akses ditolak.' });
-    return;
-  }
-  const user = await prisma.user.findUnique({ where: { id: req.user.id } });
-  const { currentPassword, currentTotpCode } = req.body;
-  if (!user || !(await bcrypt.compare(String(currentPassword || ''), user.password))) {
-    res.status(401).json({ success: false, message: 'Reautentikasi gagal.' });
-    return;
-  }
-  if (user.totpEnabled && (!user.totpSecretEncrypted || !authenticator.verify({ token: String(currentTotpCode || ''), secret: decryptSecret(user.totpSecretEncrypted) }))) {
-    res.status(401).json({ success: false, message: 'Kode MFA aktif tidak valid.' });
-    return;
-  }
-  const secret = authenticator.generateSecret();
-  await prisma.user.update({ where: { id: req.user.id }, data: { pendingTotpSecretEncrypted: encryptSecret(secret), pendingTotpCreatedAt: new Date() } });
-  res.json({ success: true, data: { secret, otpauthUrl: authenticator.keyuri(req.user.email, process.env.TOTP_ISSUER || 'IT Helpdesk', secret) } });
-};
-
-export const enableMfa = async (req: AuthRequest, res: Response): Promise<void> => {
-  const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
-  if (!user?.pendingTotpSecretEncrypted || !user.pendingTotpCreatedAt || user.pendingTotpCreatedAt < new Date(Date.now() - 10 * 60000) || !authenticator.verify({ token: String(req.body.code || ''), secret: decryptSecret(user.pendingTotpSecretEncrypted) })) {
-    res.status(400).json({ success: false, message: 'Kode MFA tidak valid.' });
-    return;
-  }
-  await prisma.user.update({ where: { id: user.id }, data: { totpSecretEncrypted: user.pendingTotpSecretEncrypted, pendingTotpSecretEncrypted: null, pendingTotpCreatedAt: null, totpEnabled: true, lastTotpStep: BigInt(Math.floor(Date.now() / 30000)) } });
-  res.json({ success: true });
 };
 
 export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
