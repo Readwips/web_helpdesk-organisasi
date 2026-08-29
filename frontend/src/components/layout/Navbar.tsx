@@ -43,11 +43,11 @@ export default function Navbar({ onMenuToggle }: NavbarProps) {
       </button>
 
       {/* Right */}
-      <div className="flex items-center gap-2">
+      <div className="ml-auto flex items-center gap-2">
         {/* Search hint — desktop only */}
         <button
           onClick={() => window.dispatchEvent(new CustomEvent('open-global-search'))}
-          className="hidden md:flex items-center gap-2 border rounded-lg px-3 py-1.5 text-sm transition-colors hover:bg-slate-800/50 cursor-pointer"
+          className="hidden md:flex w-72 items-center gap-2 border rounded-lg px-3 py-1.5 text-sm transition-colors hover:bg-slate-800/50 cursor-pointer"
           style={{
             background: 'var(--background)',
             borderColor: 'var(--border)',
